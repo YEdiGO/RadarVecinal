@@ -1,0 +1,28 @@
+<div class="row g-3">
+  @for (grafico of [{ t: 'Reportes por barrio', d: porBarrio() }, { t: 'Reportes por tipo', d: porTipo() }, { t: 'Reportes por mes', d: porMes() }]; track grafico.t) {
+    <div class="col-12 col-lg-4">
+      <div class="card p-3 h-100">
+        <h3 class="h6 fw-bold">{{ grafico.t }}</h3>
+        @for (b of grafico.d; track b.nombre) {
+          <div class="small d-flex justify-content-between"><span>{{ b.nombre }}</span><strong>{{ b.valor }}</strong></div>
+          <div class="progress mb-2" style="height: .5rem"><div class="progress-bar bg-info" [style.width.%]="b.porcentaje"></div></div>
+        } @empty {
+          <p class="small text-secondary mb-0">Sin datos.</p>
+        }
+      </div>
+    </div>
+  }
+  <div class="col-12">
+    <div class="card p-3">
+      <h3 class="h6 fw-bold">Puntos más calientes</h3>
+      <table class="table table-sm mb-0">
+        <thead><tr><th>Barrio</th><th>Coordenadas</th><th class="text-end">Reportes</th><th class="text-end">Temperatura</th></tr></thead>
+        <tbody>
+          @for (p of puntos(); track $index) {
+            <tr><td>{{ nombreBarrio(p.id_barrio) }}</td><td>{{ p.lat.toFixed(3) }}, {{ p.lng.toFixed(3) }}</td><td class="text-end">{{ p.cantidad }}</td><td class="text-end">{{ p.temperatura.toFixed(1) }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

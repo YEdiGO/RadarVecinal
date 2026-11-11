@@ -1,0 +1,27 @@
+.pantalla-espera {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.13), transparent 26rem),
+    var(--radar-fondo);
+}
+
+.tarjeta-espera {
+  width: 100%;
+  max-width: 26rem;
+  border-radius: 1.25rem;
+}
+
+.estado-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 1.25rem;
+  background: rgba(20, 184, 166, 0.13);
+  color: var(--radar-acento-oscuro);
+  font-size: 2rem;
+}
+
+.estado-icono-rechazado {
+  background: #fdeceb;
+  color: #c0392b;
+}

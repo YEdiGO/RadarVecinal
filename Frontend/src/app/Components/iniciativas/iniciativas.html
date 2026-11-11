@@ -1,0 +1,40 @@
+<div class="container py-4" style="max-width: 56rem">
+  <div class="pagina-encabezado mb-3">
+    <div>
+      <span class="eyebrow">Participación vecinal</span>
+      <h1 class="h3 fw-bold mb-1">Iniciativas vecinales</h1>
+      <p class="text-secondary mb-0">Propuestas de los vecinos para mejorar la seguridad del barrio.</p>
+    </div>
+    <button class="btn btn-acento" (click)="creando.set(true)"><i class="bi bi-plus-lg me-1"></i>Nueva</button>
+  </div>
+
+  @if (cargando()) {
+    <app-cargando mensaje="Cargando iniciativas…" />
+  } @else if (errorCarga()) {
+    <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
+  } @else if (lista().length === 0) {
+    <div class="vacio"><i class="bi bi-megaphone"></i>Todavía no hay iniciativas.</div>
+  } @else {
+    <div class="row g-3">
+      @for (i of lista(); track i.id) {
+        <div class="col-12 col-md-6">
+          <a [routerLink]="['/iniciativas', i.id]" class="card card-interactiva p-3 h-100 text-decoration-none text-reset">
+            <div class="d-flex justify-content-between gap-2">
+              <h2 class="h6 fw-bold">{{ i.titulo }}</h2>
+              <span class="badge text-bg-{{ color(i.estado) }} align-self-start">{{ i.estado }}</span>
+            </div>
+            <p class="small text-secondary mb-2"><i class="bi bi-geo-alt me-1"></i>{{ nombreBarrio(i.id_barrio) }}</p>
+            <p class="small mb-2">{{ i.descripcion }}</p>
+            <div class="small mt-auto"><i class="bi bi-people me-1"></i>{{ i.participantes }} participantes @if (i.sumado) { · <span class="text-success">Ya te sumaste</span> } @if (i.es_mia) { · <span class="text-acento">Tuya</span> }</div>
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (creando()) {
+  <app-modal titulo="Nueva iniciativa" (cerrar)="creando.set(false)">
+    <app-iniciativa-formulario (guardado)="recargar()" (cancelado)="creando.set(false)" />
+  </app-modal>
+}

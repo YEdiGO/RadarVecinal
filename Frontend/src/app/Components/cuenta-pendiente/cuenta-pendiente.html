@@ -1,0 +1,24 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center px-3 pantalla-espera">
+  <div class="card p-4 p-sm-5 text-center sombra tarjeta-espera">
+    @if (auth.usuario()?.estado === 'Rechazado') {
+      <span class="estado-icono estado-icono-rechazado"><i class="bi bi-x-lg"></i></span>
+      <h1 class="h4 fw-bold mt-3">Solicitud rechazada</h1>
+      <p class="text-secondary">La Municipalidad no aprobó tu solicitud de acceso.</p>
+    } @else {
+      <span class="estado-icono"><i class="bi bi-hourglass-split"></i></span>
+      <h1 class="h4 fw-bold mt-3">Tu cuenta está en revisión</h1>
+      <p class="text-secondary">
+        Hola, {{ auth.usuario()?.nombre }}. La Municipalidad está verificando tu solicitud. Podrás usar Radar Vecinal
+        apenas te aprueben.
+      </p>
+      <button class="btn btn-acento w-100" [disabled]="cargando()" [attr.aria-busy]="cargando()" (click)="revisar()">
+        @if (cargando()) {
+          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Revisando…
+        } @else {
+          <i class="bi bi-arrow-repeat me-1"></i>Revisar estado
+        }
+      </button>
+    }
+    <button class="btn btn-link text-secondary btn-sm mt-2" (click)="salir()">Cerrar sesión</button>
+  </div>
+</div>

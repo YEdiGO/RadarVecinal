@@ -1,0 +1,103 @@
+<div class="pantalla">
+  <app-mapa-calor
+    [zonas]="zonas()"
+    [reportes]="reportes()"
+    [acciones]="acciones()"
+    [alertas]="alertas()"
+    [seleccion]="zonaId()"
+    [elegir]="reportando()"
+    [punto]="punto()"
+    (zonaClick)="zonaId.set($event)"
+    (reporteClick)="reporteId.set($event)"
+    (accionClick)="verAccion($event)"
+    (puntoElegido)="punto.set($event)"
+  />
+
+  @if (cargando()) {
+    <div class="flotante aviso-mapa cargando-mapa" role="status" aria-live="polite">
+      <span class="spinner-border spinner-border-sm text-acento" aria-hidden="true"></span>
+      <span class="small fw-semibold">Actualizando mapa…</span>
+    </div>
+  } @else if (errorCarga()) {
+    <div class="flotante aviso-mapa error-mapa" role="alert">
+      <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+      <span class="small">{{ errorCarga() }}</span>
+      <button type="button" class="btn btn-sm btn-outline-danger ms-auto" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Filtros -->
+  @if (!reportando()) {
+    <div class="flotante filtros card p-2 d-flex flex-row gap-2">
+      <select class="form-select form-select-sm" aria-label="Tipo de incidente" [formField]="formFiltros.tipo">
+        <option value="todos">Todos los tipos</option>
+        @for (tipo of tipos; track tipo) {
+          <option [value]="tipo">{{ etiquetaTipo[tipo] }}</option>
+        }
+      </select>
+      <select class="form-select form-select-sm" aria-label="Periodo" [formField]="formFiltros.dias">
+        <option value="2">Últimas 48 h</option>
+        <option value="7">7 días</option>
+        <option value="30">30 días</option>
+      </select>
+    </div>
+  }
+
+  <!-- Aviso y leyenda -->
+  @if (!reportando() && !zonaId()) {
+    <div class="flotante leyenda card p-2 small">
+      @for (nivel of niveles; track nivel) {
+        <span class="me-2"><span class="punto-nivel heat-{{ nivel }} me-1"></span>{{ etiquetaNivel[nivel] }}</span>
+      }
+    </div>
+  }
+
+  <!-- Botones del Vecino -->
+  @if (auth.esVecino() && !reportando()) {
+    <div class="flotante acciones d-flex flex-column gap-2 align-items-end">
+      <app-alerta-boton (activada)="cargarAlertas()" />
+      <button class="btn btn-acento btn-lg shadow" (click)="iniciarReporte()"><i class="bi bi-plus-circle me-1"></i>Reportar incidente</button>
+    </div>
+  }
+
+  <!-- Panel de un barrio -->
+  @if (zonaSeleccionada(); as zona) {
+    <div class="flotante panel card p-3 sombra">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h2 class="h5 fw-bold mb-1">{{ zona.nombre }}</h2>
+          <span class="badge heat-{{ zona.nivel }} {{ zona.nivel === 'amarillo' ? 'text-dark' : '' }}">{{ etiquetaNivel[zona.nivel] }}</span>
+        </div>
+        <button class="btn-close" aria-label="Cerrar" (click)="zonaId.set(null)"></button>
+      </div>
+      <p class="small text-secondary mt-2 mb-2">Temperatura {{ zona.temperatura.toFixed(1) }} · {{ zona.cantidad }} reportes en el periodo</p>
+      @for (t of zona.tipos_frecuentes; track t.tipo) {
+        <div class="small">• {{ etiquetaTipo[t.tipo] }} ({{ t.cantidad }})</div>
+      }
+      @if (accionesDe(zona.id).length) {
+        <h3 class="h6 fw-bold mt-3">Respuesta oficial</h3>
+        @for (a of accionesDe(zona.id).slice(0, 2); track a.id) {
+          <div class="small mb-1"><i class="bi bi-shield-check text-acento me-1"></i>{{ a.titulo }} · {{ a.estado }}</div>
+        }
+      }
+    </div>
+  }
+
+  <!-- Formulario de reporte (se elige el punto tocando el mapa) -->
+  @if (reportando()) {
+    <div class="flotante hoja card p-3 sombra">
+      <h2 class="h5 fw-bold">Reportar incidente</h2>
+      <app-reporte-formulario [punto]="punto()" (guardado)="reporteGuardado()" (cancelado)="reportando.set(false); punto.set(null)" />
+    </div>
+  }
+</div>
+
+@if (reporteId(); as id) {
+  <app-reporte-detalle [id]="id" (cerrar)="reporteId.set(null)" (cambiado)="cargar()" />
+}
+
+@if (accionVista(); as accion) {
+  <app-modal titulo="Respuesta oficial" (cerrar)="accionVista.set(null)">
+    <app-accion-noticia [accion]="accion" />
+  </app-modal>
+}

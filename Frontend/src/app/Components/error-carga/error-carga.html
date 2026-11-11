@@ -1,0 +1,10 @@
+<div class="estado-error" role="alert">
+  <span class="estado-error-icono" aria-hidden="true"><i class="bi bi-cloud-slash"></i></span>
+  <div class="flex-grow-1">
+    <h2 class="h6 fw-bold mb-1">{{ titulo() }}</h2>
+    <p class="small text-secondary mb-3">{{ mensaje() }}</p>
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="reintentar.emit()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+    </button>
+  </div>
+</div>

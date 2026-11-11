@@ -1,0 +1,42 @@
+<app-modal titulo="Detalle del reporte" (cerrar)="cerrar.emit()">
+  @if (cargando()) {
+    <app-cargando mensaje="Cargando el reporte…" />
+  } @else if (errorCarga()) {
+    <app-error-carga [titulo]="'No pudimos abrir el reporte'" [mensaje]="errorCarga()" (reintentar)="cargar()" />
+  } @else if (detalle(); as d) {
+    <div class="d-flex flex-wrap gap-2 mb-2">
+      <span class="badge text-bg-dark">{{ etiqueta[d.tipo] }}</span>
+      <span class="badge text-bg-secondary text-capitalize">{{ d.estado }}</span>
+      <span class="badge text-bg-light border">Gravedad {{ d.gravedad }}</span>
+    </div>
+    <p class="fs-6">{{ d.descripcion }}</p>
+    <p class="small text-secondary mb-3">
+      {{ d.fecha | date: 'dd/MM/yyyy HH:mm' }} · {{ d.confirmaciones }} confirmaciones · {{ d.incorrectos }} "incorrecto"
+    </p>
+
+    @if (auth.esVecino()) {
+      @if (d.propio) {
+        <div class="alert alert-info py-2 small mb-0">Este reporte es tuyo; edítalo o elimínalo desde "Mis reportes".</div>
+      } @else {
+        @if (d.mi_voto) {
+          <div class="alert alert-secondary py-2 small">Tu valoración: <strong>{{ d.mi_voto }}</strong></div>
+        } @else {
+          <div class="d-flex gap-2 mb-2">
+            <button class="btn btn-success flex-fill" (click)="votar('confirmo')"><i class="bi bi-hand-thumbs-up me-1"></i>Lo confirmo</button>
+            <button class="btn btn-outline-secondary flex-fill" (click)="votar('incorrecto')"><i class="bi bi-hand-thumbs-down me-1"></i>Incorrecto</button>
+          </div>
+        }
+        <button class="btn btn-link text-danger btn-sm p-0" [disabled]="d.denunciado" (click)="denunciar()">
+          <i class="bi bi-flag me-1"></i>{{ d.denunciado ? 'Ya denunciaste este reporte' : 'Denunciar reporte' }}
+        </button>
+      }
+    }
+
+    @if (auth.esMunicipalidad()) {
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-danger flex-fill" (click)="moderar('falso')"><i class="bi bi-x-octagon me-1"></i>Marcar falso</button>
+        <button class="btn btn-outline-secondary flex-fill" (click)="moderar('archivado')"><i class="bi bi-archive me-1"></i>Archivar</button>
+      </div>
+    }
+  }
+</app-modal>

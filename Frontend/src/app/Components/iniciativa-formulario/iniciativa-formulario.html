@@ -1,0 +1,33 @@
+<form (submit)="enviar($event)" novalidate>
+  <div class="mb-3">
+    <label for="titulo" class="form-label fw-semibold">Título</label>
+    <input id="titulo" class="form-control" [formField]="formulario.titulo" [class.is-invalid]="formulario.titulo().touched() && formulario.titulo().invalid()" />
+    @if (formulario.titulo().touched() && formulario.titulo().invalid()) { <div class="invalid-feedback">{{ formulario.titulo().errors()[0].message }}</div> }
+  </div>
+  <div class="mb-3">
+    <label for="descripcion" class="form-label fw-semibold">Descripción</label>
+    <textarea id="descripcion" class="form-control" [formField]="formulario.descripcion" [class.is-invalid]="formulario.descripcion().touched() && formulario.descripcion().invalid()"></textarea>
+    @if (formulario.descripcion().touched() && formulario.descripcion().invalid()) { <div class="invalid-feedback">{{ formulario.descripcion().errors()[0].message }}</div> }
+  </div>
+  <div class="mb-3">
+    <label for="meta" class="form-label fw-semibold">Meta</label>
+    <input id="meta" class="form-control" placeholder="Ej: 100 firmas" [formField]="formulario.meta" [class.is-invalid]="formulario.meta().touched() && formulario.meta().invalid()" />
+    @if (formulario.meta().touched() && formulario.meta().invalid()) { <div class="invalid-feedback">{{ formulario.meta().errors()[0].message }}</div> }
+  </div>
+  <div class="mb-3">
+    <label for="estado" class="form-label fw-semibold">Estado</label>
+    <select id="estado" class="form-select" [formField]="formulario.estado">
+      @for (e of estados; track e) { <option [value]="e">{{ e }}</option> }
+    </select>
+  </div>
+  <div class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancelado.emit()">Cancelar</button>
+    <button type="submit" class="btn btn-acento" [disabled]="cargando()" [attr.aria-busy]="cargando()">
+      @if (cargando()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Guardando…
+      } @else {
+        Guardar
+      }
+    </button>
+  </div>
+</form>

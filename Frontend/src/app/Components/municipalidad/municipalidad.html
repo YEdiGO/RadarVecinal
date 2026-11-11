@@ -1,0 +1,115 @@
+<div class="container-fluid py-4 px-3 px-md-4">
+  <div class="pagina-encabezado mb-3">
+    <div>
+      <span class="eyebrow">Gestión municipal</span>
+      <h1 class="h3 fw-bold mb-1">Panel de la Municipalidad</h1>
+      <p class="text-secondary mb-0">Detecta dónde actuar primero y responde a los vecinos.</p>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-3 flex-nowrap overflow-auto">
+    @for (p of pestanas; track p.id) {
+      <li class="nav-item">
+        <button class="nav-link text-nowrap" [class.active]="pestana() === p.id" (click)="pestana.set(p.id)">
+          {{ p.texto }}
+          @if (p.id === 'criticos' && panel()?.criticos?.length) { <span class="badge text-bg-danger ms-1">{{ panel()!.criticos.length }}</span> }
+          @if (p.id === 'vecinos' && panel()?.pendientes?.length) { <span class="badge text-bg-warning ms-1">{{ panel()!.pendientes.length }}</span> }
+        </button>
+      </li>
+    }
+  </ul>
+
+  @if (cargando()) {
+    <app-cargando mensaje="Cargando el panel municipal…" />
+  } @else if (errorCarga()) {
+    <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
+  } @else if (panel(); as d) {
+    @switch (pestana()) {
+      @case ('criticos') {
+        <p class="small text-secondary">Barrios en nivel alerta o crítico sin ninguna acción registrada en los últimos 15 días.</p>
+        @for (z of d.criticos; track z.id) {
+          <div class="card p-3 mb-2 d-flex flex-row align-items-center gap-3">
+            <span class="punto-nivel heat-{{ z.nivel }}"></span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ z.nombre }} <span class="small text-secondary">· {{ etiquetaNivel[z.nivel] }}</span></div>
+              <div class="small text-secondary">Temperatura {{ z.temperatura.toFixed(1) }} · {{ z.cantidad }} reportes</div>
+            </div>
+            <button class="btn btn-acento btn-sm" (click)="responder(z.id)">Registrar acción</button>
+          </div>
+        } @empty {
+          <div class="vacio"><i class="bi bi-check-circle"></i>No hay barrios críticos sin respuesta.</div>
+        }
+      }
+      @case ('acciones') {
+        <div class="card p-3 mb-4">
+          <h2 class="h5 fw-bold">Registrar acción</h2>
+          <app-accion-formulario [barrioInicial]="barrioElegido()" (guardado)="accionGuardada()" />
+        </div>
+        <h2 class="h5 fw-bold">Mis acciones</h2>
+        @for (a of d.propias; track a.id) {
+          <div class="card p-3 mb-2 d-flex flex-row align-items-center gap-3 flex-wrap">
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ a.titulo }}</div>
+              <div class="small text-secondary">{{ nombreBarrio(a.id_barrio) }} · {{ a.tipo }} · {{ a.fecha | date: 'dd/MM/yyyy' }}</div>
+            </div>
+            <select class="form-select form-select-sm w-auto" aria-label="Estado" [value]="a.estado" (change)="cambiarEstado(a, $event)">
+              @for (e of estados; track e) { <option [value]="e">{{ e }}</option> }
+            </select>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline-secondary" aria-label="Editar" (click)="editando.set(a)"><i class="bi bi-pencil"></i></button>
+              <button class="btn btn-sm btn-outline-danger" aria-label="Eliminar" (click)="eliminarAccion(a)"><i class="bi bi-trash"></i></button>
+            </div>
+          </div>
+        } @empty {
+          <div class="vacio"><i class="bi bi-clipboard"></i>Aún no registras acciones.</div>
+        }
+      }
+      @case ('vecinos') {
+        @for (u of d.pendientes; track u.id) {
+          <div class="card p-3 mb-2 d-flex flex-row align-items-center gap-3">
+            <div class="flex-grow-1">
+              <div class="fw-semibold">{{ u.nombre }}</div>
+              <div class="small text-secondary">{{ u.correo }} · {{ nombreBarrio(u.id_barrio ?? '') }}</div>
+            </div>
+            <button class="btn btn-sm btn-success" (click)="verificar(u.id, 'aprobar')">Aprobar</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="verificar(u.id, 'rechazar')">Rechazar</button>
+          </div>
+        } @empty {
+          <div class="vacio"><i class="bi bi-people"></i>No hay vecinos pendientes.</div>
+        }
+      }
+      @case ('reportes') {
+        <div class="table-responsive card">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th>Tipo</th><th>Barrio</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              @for (r of d.reportes; track r.id) {
+                <tr>
+                  <td>{{ etiquetaTipo[r.tipo] }}</td><td>{{ nombreBarrio(r.id_barrio) }}</td>
+                  <td>{{ r.fecha | date: 'dd/MM/yyyy' }}</td><td class="text-capitalize">{{ r.estado }}</td>
+                  <td class="text-end"><button class="btn btn-sm btn-outline-secondary" (click)="reporteId.set(r.id)">Ver / moderar</button></td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5"><div class="vacio py-4"><i class="bi bi-inbox"></i>No hay reportes para moderar.</div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @case ('estadisticas') {
+        <app-estadisticas [reportes]="d.reportes" [zonas]="d.zonas" [puntos]="d.puntos" />
+      }
+    }
+  }
+</div>
+
+@if (editando(); as accion) {
+  <app-modal titulo="Editar acción" [grande]="true" (cerrar)="editando.set(null)">
+    <app-accion-formulario [accion]="accion" (guardado)="accionGuardada()" (cancelado)="editando.set(null)" />
+  </app-modal>
+}
+@if (reporteId(); as id) {
+  <app-reporte-detalle [id]="id" (cerrar)="reporteId.set(null)" (cambiado)="cargar()" />
+}

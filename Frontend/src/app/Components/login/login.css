@@ -1,0 +1,67 @@
+.pantalla-login {
+  position: relative;
+  overflow: hidden;
+}
+
+.pantalla-login::before,
+.pantalla-login::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.pantalla-login::before {
+  top: -8rem;
+  right: -6rem;
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.28), transparent 68%);
+}
+
+.pantalla-login::after {
+  bottom: -10rem;
+  left: -8rem;
+  width: 26rem;
+  height: 26rem;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.14), transparent 68%);
+}
+
+.caja {
+  position: relative;
+  z-index: 1;
+  max-width: 24.5rem;
+}
+
+.logo {
+  display: inline-grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, #5eead4, var(--radar-acento));
+  color: #06302b;
+  font-size: 2rem;
+  box-shadow: 0 18px 34px -18px rgba(20, 184, 166, 0.9);
+}
+
+.pantalla-login .card {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.55);
+}
+
+.demo {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+}
+
+.demo .btn-outline-light {
+  --bs-btn-border-color: rgba(255, 255, 255, 0.35);
+  --bs-btn-hover-bg: rgba(255, 255, 255, 0.16);
+  --bs-btn-hover-border-color: rgba(255, 255, 255, 0.6);
+}

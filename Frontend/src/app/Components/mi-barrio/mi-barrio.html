@@ -1,0 +1,51 @@
+<div class="container py-4" style="max-width: 56rem">
+  @if (cargando()) {
+    <app-cargando mensaje="Cargando tu barrio…" />
+  } @else if (errorCarga()) {
+    <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
+  } @else if (datos(); as d) {
+    @if (d.zona; as zona) {
+      <div class="pagina-encabezado mb-3">
+        <div>
+          <span class="eyebrow">Tu barrio</span>
+          <h1 class="h3 fw-bold mb-1">{{ zona.nombre }}</h1>
+          <p class="text-secondary mb-0">Así está la seguridad en tu zona y la respuesta oficial.</p>
+        </div>
+        <span class="badge rounded-pill heat-{{ zona.nivel }} {{ zona.nivel === 'amarillo' ? 'text-dark' : 'text-white' }} px-3 py-2">{{ etiquetaNivel[zona.nivel] }}</span>
+      </div>
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+          <div class="card card-metrica p-3 h-100">
+            <div class="small text-secondary">Estado</div>
+            <div class="fw-bold fs-5"><span class="punto-nivel heat-{{ zona.nivel }} me-2"></span>{{ etiquetaNivel[zona.nivel] }}</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="card card-metrica p-3 h-100"><div class="small text-secondary">Temperatura</div><div class="fw-bold fs-5">{{ zona.temperatura.toFixed(1) }}</div></div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card card-metrica p-3 h-100"><div class="small text-secondary">Reportes últimos 7 días</div><div class="fw-bold fs-5">{{ d.reportes.length }}</div></div>
+        </div>
+      </div>
+      @if (zona.tipos_frecuentes.length) {
+        <h2 class="h5 fw-bold">Incidentes más frecuentes</h2>
+        <ul>
+          @for (t of zona.tipos_frecuentes; track t.tipo) {
+            <li>{{ etiquetaTipo[t.tipo] }} ({{ t.cantidad }})</li>
+          }
+        </ul>
+      }
+    }
+
+    <h2 class="h5 fw-bold mt-4">Respuesta de la Municipalidad</h2>
+    @if (d.noticias.length === 0) {
+      <div class="vacio"><i class="bi bi-building"></i>La Municipalidad aún no registra acciones en tu barrio.</div>
+    } @else {
+      <div class="row g-3">
+        @for (n of d.noticias; track n.id) {
+          <div class="col-12 col-md-6"><app-accion-noticia [accion]="n" [temperaturaActual]="d.zona?.temperatura ?? null" /></div>
+        }
+      </div>
+    }
+  }
+</div>

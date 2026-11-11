@@ -1,0 +1,56 @@
+<form (submit)="enviar($event)" novalidate>
+  <fieldset class="mb-3">
+    <legend class="form-label fw-semibold fs-6">Tipo de incidente</legend>
+    @for (tipo of tipos; track tipo) {
+      <div class="form-check">
+        <input class="form-check-input" type="radio" [id]="'tipo-' + tipo" [value]="tipo" [formField]="formulario.tipo" />
+        <label class="form-check-label" [for]="'tipo-' + tipo">{{ etiqueta[tipo] }}</label>
+      </div>
+    }
+    @if (formulario.tipo().touched() && formulario.tipo().invalid()) {
+      <div class="text-danger small mt-1">{{ formulario.tipo().errors()[0].message }}</div>
+    }
+  </fieldset>
+
+  <div class="mb-3">
+    <label for="descripcion" class="form-label fw-semibold">Descripción</label>
+    <textarea
+      id="descripcion"
+      class="form-control"
+      placeholder="¿Qué ocurrió?"
+      [formField]="formulario.descripcion"
+      [class.is-invalid]="formulario.descripcion().touched() && formulario.descripcion().invalid()"
+    ></textarea>
+    <div class="d-flex justify-content-between">
+      <div class="invalid-feedback d-block">
+        @if (formulario.descripcion().touched() && formulario.descripcion().invalid()) {
+          {{ formulario.descripcion().errors()[0].message }}
+        }
+      </div>
+      <small class="text-secondary">{{ modelo().descripcion.length }}/280</small>
+    </div>
+  </div>
+
+  @if (!reporte()) {
+    <div class="mb-3 small">
+      @if (modelo().lat !== 0) {
+        <span class="text-success"><i class="bi bi-geo-alt-fill me-1"></i>Punto elegido ({{ modelo().lat.toFixed(4) }}, {{ modelo().lng.toFixed(4) }})</span>
+      } @else {
+        <span [class.text-danger]="formulario.lat().touched()"><i class="bi bi-geo-alt me-1"></i>Toca el mapa para elegir el lugar del incidente.</span>
+      }
+    </div>
+  }
+
+  <p class="small text-secondary"><i class="bi bi-shield-lock me-1"></i>Tu reporte es anónimo: los demás no ven quién lo envió.</p>
+
+  <div class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-outline-secondary" (click)="cancelado.emit()">Cancelar</button>
+    <button type="submit" class="btn btn-acento" [disabled]="cargando()" [attr.aria-busy]="cargando()">
+      @if (cargando()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>{{ reporte() ? 'Guardando…' : 'Enviando…' }}
+      } @else {
+        {{ reporte() ? 'Guardar cambios' : 'Enviar reporte' }}
+      }
+    </button>
+  </div>
+</form>

@@ -1,0 +1,72 @@
+<div class="min-vh-100 bg-radar pantalla-login d-flex flex-column align-items-center justify-content-center px-3 py-5">
+  <div class="w-100 caja">
+    <div class="text-center mb-4">
+      <span class="logo sombra"><i class="bi bi-broadcast-pin"></i></span>
+      <h1 class="h3 fw-bold mt-3 mb-1">Radar Vecinal</h1>
+      <p class="small opacity-75 mb-0">Seguridad ciudadana comunitaria · Huancayo</p>
+    </div>
+
+    <form class="card p-4 sombra text-dark" (submit)="enviar($event)" novalidate>
+      @if (auth.sesionExpirada()) {
+        <div class="alert alert-warning py-2 small d-flex align-items-start gap-2" role="alert">
+          <i class="bi bi-shield-exclamation mt-1"></i>
+          <span>Tu sesión expiró por seguridad. Vuelve a iniciar sesión para continuar.</span>
+        </div>
+      }
+      <div class="mb-3">
+        <label for="correo" class="form-label fw-semibold">Correo</label>
+        <input
+          id="correo"
+          type="email"
+          class="form-control"
+          autocomplete="email"
+          placeholder="vecino@barrio.com"
+          [formField]="formulario.correo"
+          [class.is-invalid]="formulario.correo().touched() && formulario.correo().invalid()"
+        />
+        @if (formulario.correo().touched() && formulario.correo().invalid()) {
+          <div class="invalid-feedback">{{ formulario.correo().errors()[0].message }}</div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="clave" class="form-label fw-semibold">Contraseña</label>
+        <input
+          id="clave"
+          type="password"
+          class="form-control"
+          autocomplete="current-password"
+          placeholder="••••••"
+          [formField]="formulario.clave"
+          [class.is-invalid]="formulario.clave().touched() && formulario.clave().invalid()"
+        />
+        @if (formulario.clave().touched() && formulario.clave().invalid()) {
+          <div class="invalid-feedback">{{ formulario.clave().errors()[0].message }}</div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-acento btn-lg w-100" [disabled]="cargando()" [attr.aria-busy]="cargando()">
+        @if (cargando()) {
+          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Ingresando…
+        } @else {
+          <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+        }
+      </button>
+      <p class="text-center small text-secondary mt-3 mb-0">
+        ¿No tienes cuenta? <a routerLink="/registro" class="fw-semibold text-acento">Regístrate</a>
+      </p>
+    </form>
+
+    <div class="demo mt-4 p-3 small">
+      <p class="fw-semibold mb-2">Cuentas de demostración (clave 123456)</p>
+      @for (cuenta of cuentasDemo; track cuenta.correo) {
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
+          <span class="text-truncate">{{ cuenta.correo }}</span>
+          <button type="button" class="btn btn-sm btn-outline-light rounded-pill" (click)="usarCuenta(cuenta.correo)">
+            {{ cuenta.actor }}
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

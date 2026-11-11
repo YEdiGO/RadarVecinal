@@ -1,0 +1,65 @@
+<div class="d-md-flex min-vh-100">
+  <!-- Menú lateral (pantallas medianas y grandes) -->
+  <aside class="lateral bg-radar d-none d-md-flex flex-column">
+    <div class="marca d-flex align-items-center gap-2 px-4 py-4">
+      <span class="marca-icono"><i class="bi bi-broadcast-pin"></i></span>
+      <div>
+        <div class="fs-5 fw-bold lh-1">Radar Vecinal</div>
+        <div class="small opacity-50">Seguridad comunitaria</div>
+      </div>
+    </div>
+    <nav class="nav flex-column px-3 gap-1" aria-label="Navegación principal">
+      @for (enlace of menu(); track enlace.ruta) {
+        <a
+          class="enlace"
+          [routerLink]="enlace.ruta"
+          routerLinkActive="activo"
+          [routerLinkActiveOptions]="{ exact: enlace.exacta ?? false }"
+        >
+          <i class="bi {{ enlace.icono }}"></i> {{ enlace.texto }}
+          @if (enlace.ruta === '/mi-barrio' && paneles.hayNoticiasNuevas()) {
+            <span class="punto-rojo" aria-label="Noticias nuevas"></span>
+          }
+        </a>
+      }
+    </nav>
+    <div class="mt-auto p-3">
+      <div class="usuario-card">
+        <span class="avatar" aria-hidden="true">{{ inicial() }}</span>
+        <div class="min-w-0">
+          <div class="fw-semibold text-truncate">{{ auth.usuario()?.nombre }}</div>
+          <div class="small opacity-50">{{ auth.esMunicipalidad() ? 'Municipalidad' : 'Vecino' }}</div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline-light w-100 mt-2" (click)="salir()">
+        <i class="bi bi-box-arrow-left me-1"></i>Cerrar sesión
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-grow-1 contenido">
+    <router-outlet />
+  </main>
+
+  <!-- Menú inferior (celulares) -->
+  <nav class="inferior bg-white border-top d-md-none" aria-label="Navegación principal">
+    @for (enlace of menu(); track enlace.ruta) {
+      <a
+        class="item"
+        [routerLink]="enlace.ruta"
+        routerLinkActive="activo"
+        [routerLinkActiveOptions]="{ exact: enlace.exacta ?? false }"
+      >
+        <i class="bi {{ enlace.icono }} fs-5"></i>
+        <span>{{ enlace.texto }}</span>
+        @if (enlace.ruta === '/mi-barrio' && paneles.hayNoticiasNuevas()) {
+          <span class="punto-rojo" aria-label="Noticias nuevas"></span>
+        }
+      </a>
+    }
+    <button type="button" class="item item-salir" (click)="salir()">
+      <i class="bi bi-box-arrow-left fs-5"></i>
+      <span>Salir</span>
+    </button>
+  </nav>
+</div>

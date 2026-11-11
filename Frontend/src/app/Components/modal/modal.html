@@ -1,0 +1,22 @@
+<div class="modal d-block fondo" tabindex="-1" role="dialog" aria-modal="true" (click)="cerrar.emit()">
+  <div
+    class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+    [class.modal-lg]="grande()"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-content border-0 sombra">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title fs-5 fw-bold">{{ titulo() }}</h2>
+          @if (subtitulo()) {
+            <p class="text-secondary small mb-0">{{ subtitulo() }}</p>
+          }
+        </div>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrar.emit()"></button>
+      </div>
+      <div class="modal-body">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+</div>

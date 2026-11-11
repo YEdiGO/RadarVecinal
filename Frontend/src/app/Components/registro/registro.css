@@ -1,0 +1,18 @@
+.pantalla-registro {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(20, 184, 166, 0.12), transparent 24rem),
+    radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.1), transparent 26rem),
+    var(--radar-fondo);
+}
+
+.tarjeta-registro {
+  padding: 2rem;
+  border: 1px solid var(--radar-borde);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: var(--radar-sombra);
+}
+
+@media (max-width: 575.98px) {
+  .tarjeta-registro { padding: 1.35rem; }
+}
