@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from backend.schemas.acciones import Accion
+
 TipoIncidente = Literal[
     "asalto_robo",
     "pandillaje",
@@ -63,6 +65,8 @@ class ReportePublico(BaseModel):
     fecha: datetime
     estado: EstadoReporte
     confirmaciones: int
+    # Cuántos vecinos lo denunciaron para revisión (0 si nadie lo ha hecho).
+    denuncias: int = 0
 
 
 class Reporte(ReportePublico):
@@ -78,3 +82,5 @@ class ReporteDetalle(ReportePublico):
     mi_voto: Literal["confirmo", "incorrecto"] | None
     denunciado: bool
     incorrectos: int
+    # Respuestas oficiales de la Municipalidad a este reporte.
+    acciones: list[Accion] = Field(default_factory=list)

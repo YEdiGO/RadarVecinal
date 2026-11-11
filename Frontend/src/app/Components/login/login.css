@@ -1,67 +1,334 @@
 .pantalla-login {
   position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1.25rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(20, 184, 166, 0.16), transparent 26rem),
+    radial-gradient(circle at 92% 92%, rgba(56, 189, 248, 0.12), transparent 26rem),
+    linear-gradient(160deg, #061a2b, #0b2239 55%, #0d3453);
 }
-
 .pantalla-login::before,
 .pantalla-login::after {
-  content: "";
+  content: '';
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
   filter: blur(2px);
 }
-
 .pantalla-login::before {
-  top: -8rem;
-  right: -6rem;
-  width: 24rem;
-  height: 24rem;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.28), transparent 68%);
-}
-
-.pantalla-login::after {
-  bottom: -10rem;
-  left: -8rem;
+  top: -9rem;
+  right: -7rem;
   width: 26rem;
   height: 26rem;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.24), transparent 68%);
+}
+.pantalla-login::after {
+  bottom: -11rem;
+  left: -9rem;
+  width: 28rem;
+  height: 28rem;
   background: radial-gradient(circle, rgba(56, 189, 248, 0.14), transparent 68%);
 }
 
-.caja {
+.login-envoltura {
   position: relative;
   z-index: 1;
-  max-width: 24.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  width: 100%;
+  max-width: 72rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.6rem;
+  background: #fff;
+  box-shadow: 0 48px 100px -50px rgba(0, 0, 0, 0.75);
 }
 
+.login-presentacion {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 12%, rgba(20, 184, 166, 0.28), transparent 18rem),
+    linear-gradient(155deg, #071c2e, #0b2a44 60%, #0e3a5b);
+  color: #fff;
+}
+.login-presentacion::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 2.4rem 2.4rem;
+  mask-image: linear-gradient(135deg, transparent 30%, #000 100%);
+  pointer-events: none;
+}
+.login-presentacion > * {
+  position: relative;
+  z-index: 1;
+}
+
+.login-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
 .logo {
   display: inline-grid;
   place-items: center;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 1.15rem;
+  flex-shrink: 0;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 0.9rem;
   background: linear-gradient(145deg, #5eead4, var(--radar-acento));
   color: #06302b;
-  font-size: 2rem;
+  font-size: 1.4rem;
   box-shadow: 0 18px 34px -18px rgba(20, 184, 166, 0.9);
 }
 
-.pantalla-login .card {
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 30px 60px -28px rgba(0, 0, 0, 0.55);
+.eyebrow-claro {
+  align-self: flex-start;
+  background: rgba(94, 234, 212, 0.14);
+  color: #5eead4;
+}
+.login-titular {
+  margin: 0.5rem 0 0.85rem;
+  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+.login-titular span {
+  color: #5eead4;
+}
+.login-bajada {
+  max-width: 30rem;
+  margin-bottom: 1.6rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.beneficios {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+.beneficios li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+.beneficios strong {
+  display: block;
+  font-size: 0.88rem;
+}
+.beneficios small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.76rem;
+}
+.beneficio-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.65rem;
+  background: rgba(94, 234, 212, 0.13);
+  color: #5eead4;
+  font-size: 0.95rem;
+}
+
+.mini-mapa {
+  position: relative;
+  min-height: 8.5rem;
+  margin-top: auto;
+  overflow: hidden;
+  border: 1px solid rgba(94, 234, 212, 0.18);
+  border-radius: 1rem;
+  background: linear-gradient(160deg, rgba(20, 184, 166, 0.12), rgba(56, 189, 248, 0.06));
+}
+.mini-cuadricula {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 1.6rem 1.6rem;
+}
+.mini-zona {
+  position: absolute;
+  padding: 0.22rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.6rem;
+  font-weight: 700;
+  backdrop-filter: blur(3px);
+}
+.mini-zona.z1 {
+  top: 1rem;
+  left: 1.2rem;
+  border-color: rgba(46, 184, 114, 0.5);
+}
+.mini-zona.z2 {
+  top: 3.4rem;
+  left: 44%;
+  border-color: rgba(245, 139, 31, 0.5);
+}
+.mini-zona.z3 {
+  bottom: 1.2rem;
+  right: 1.3rem;
+  border-color: rgba(217, 56, 43, 0.5);
+}
+.mini-punto {
+  position: absolute;
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: var(--heat-rojo);
+  box-shadow: 0 0 0 4px rgba(217, 56, 43, 0.16);
+}
+.mini-punto.p1 {
+  top: 2.4rem;
+  right: 22%;
+}
+.mini-punto.p2 {
+  bottom: 2rem;
+  left: 22%;
+  background: var(--heat-amarillo);
+}
+.mini-punto.p3 {
+  top: 50%;
+  right: 38%;
+  background: var(--heat-verde);
+}
+.mini-leyenda {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.64rem;
+  font-weight: 600;
+}
+.mini-leyenda .pulso {
+  width: 0.42rem;
+  height: 0.42rem;
+}
+
+.login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(20, 184, 166, 0.08), transparent 18rem), #f8fbfd;
+}
+.caja {
+  width: 100%;
+  max-width: 23.5rem;
+}
+
+.login-panel .card {
+  border: 1px solid var(--radar-borde);
+  border-radius: 1.15rem;
+  background: #fff;
+  box-shadow: 0 24px 44px -36px rgba(8, 34, 56, 0.5);
+}
+
+.campo-icono {
+  position: relative;
+}
+.campo-icono > i {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  z-index: 2;
+  color: #8ba0b3;
+  font-size: 0.92rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.campo-icono .form-control {
+  padding-left: 2.45rem;
 }
 
 .demo {
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--radar-borde);
   border-radius: 0.9rem;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(10px);
+  background: #fff;
+  color: var(--radar-texto);
+  box-shadow: 0 14px 30px -28px rgba(8, 34, 56, 0.45);
+}
+.demo p {
+  color: var(--radar-texto-suave);
+}
+.demo-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+}
+.demo-fila + .demo-fila {
+  border-top: 1px dashed #e8eff5;
+}
+.demo .btn-outline-light {
+  --bs-btn-color: var(--radar-primario);
+  --bs-btn-border-color: #d5e3ec;
+  --bs-btn-hover-bg: var(--radar-primario);
+  --bs-btn-hover-border-color: var(--radar-primario);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-font-size: 0.7rem;
 }
 
-.demo .btn-outline-light {
-  --bs-btn-border-color: rgba(255, 255, 255, 0.35);
-  --bs-btn-hover-bg: rgba(255, 255, 255, 0.16);
-  --bs-btn-hover-border-color: rgba(255, 255, 255, 0.6);
+@media (max-width: 991.98px) {
+  .login-envoltura {
+    grid-template-columns: 1fr;
+    max-width: 30rem;
+  }
+  .login-presentacion {
+    padding: 1.5rem;
+  }
+  .login-titular {
+    font-size: 1.65rem;
+  }
+  .beneficios,
+  .mini-mapa,
+  .login-bajada {
+    display: none;
+  }
+  .login-panel {
+    padding: 1.5rem;
+  }
+}
+@media (max-width: 575.98px) {
+  .pantalla-login {
+    padding: 0.75rem;
+  }
+  .login-envoltura {
+    border-radius: 1.25rem;
+  }
+  .login-presentacion {
+    padding: 1.25rem;
+  }
+  .login-panel {
+    padding: 1.15rem;
+  }
 }

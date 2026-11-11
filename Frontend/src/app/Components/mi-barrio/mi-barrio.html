@@ -1,49 +1,136 @@
-<div class="container py-4" style="max-width: 56rem">
+<div class="container py-4" style="max-width: 60rem">
   @if (cargando()) {
     <app-cargando mensaje="Cargando tu barrio…" />
   } @else if (errorCarga()) {
     <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
   } @else if (datos(); as d) {
     @if (d.zona; as zona) {
-      <div class="pagina-encabezado mb-3">
-        <div>
-          <span class="eyebrow">Tu barrio</span>
-          <h1 class="h3 fw-bold mb-1">{{ zona.nombre }}</h1>
-          <p class="text-secondary mb-0">Así está la seguridad en tu zona y la respuesta oficial.</p>
+      <section class="hero-banda mb-3">
+        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+          <div class="min-w-0">
+            <span class="eyebrow">Tu barrio</span>
+            <h1 class="h2 fw-bold mb-2">{{ zona.nombre }}</h1>
+            <p class="mb-0 text-secondary" style="max-width: 34rem">
+              Así está la seguridad en tu zona y la respuesta oficial de la Municipalidad.
+            </p>
+          </div>
+          <div class="hero-temperatura">
+            <div class="hero-temperatura-valor">{{ zona.temperatura.toFixed(1) }}</div>
+            <div class="hero-temperatura-label">temperatura</div>
+            <span
+              class="badge heat-{{ zona.nivel }} {{
+                zona.nivel === 'amarillo' ? 'text-dark' : 'text-white'
+              }} mt-1"
+            >
+              {{ etiquetaNivel[zona.nivel] }}
+            </span>
+          </div>
         </div>
-        <span class="badge rounded-pill heat-{{ zona.nivel }} {{ zona.nivel === 'amarillo' ? 'text-dark' : 'text-white' }} px-3 py-2">{{ etiquetaNivel[zona.nivel] }}</span>
-      </div>
+        <div class="barra-heat nivel-{{ zona.nivel }} mt-3">
+          <span [style.width.%]="anchoTemperatura(zona.temperatura)"></span>
+        </div>
+      </section>
+
       <div class="row g-3 mb-4">
         <div class="col-6 col-md-4">
-          <div class="card card-metrica p-3 h-100">
-            <div class="small text-secondary">Estado</div>
-            <div class="fw-bold fs-5"><span class="punto-nivel heat-{{ zona.nivel }} me-2"></span>{{ etiquetaNivel[zona.nivel] }}</div>
+          <div class="metrica h-100">
+            <span
+              class="metrica-icono"
+              [class.rojo]="zona.nivel === 'rojo'"
+              [class.ambar]="zona.nivel === 'naranja'"
+            >
+              <i class="bi bi-activity"></i>
+            </span>
+            <div>
+              <div class="metrica-valor" style="font-size: 1.15rem">
+                {{ etiquetaNivel[zona.nivel] }}
+              </div>
+              <div class="metrica-label">Estado del barrio</div>
+            </div>
           </div>
         </div>
         <div class="col-6 col-md-4">
-          <div class="card card-metrica p-3 h-100"><div class="small text-secondary">Temperatura</div><div class="fw-bold fs-5">{{ zona.temperatura.toFixed(1) }}</div></div>
+          <div class="metrica h-100">
+            <span class="metrica-icono azul"><i class="bi bi-thermometer-half"></i></span>
+            <div>
+              <div class="metrica-valor">{{ zona.temperatura.toFixed(1) }}</div>
+              <div class="metrica-label">Temperatura actual</div>
+            </div>
+          </div>
         </div>
         <div class="col-12 col-md-4">
-          <div class="card card-metrica p-3 h-100"><div class="small text-secondary">Reportes últimos 7 días</div><div class="fw-bold fs-5">{{ d.reportes.length }}</div></div>
+          <div class="metrica h-100">
+            <span class="metrica-icono"><i class="bi bi-geo-alt"></i></span>
+            <div>
+              <div class="metrica-valor">{{ d.reportes.length }}</div>
+              <div class="metrica-label">Reportes en los últimos 7 días</div>
+            </div>
+          </div>
         </div>
       </div>
-      @if (zona.tipos_frecuentes.length) {
-        <h2 class="h5 fw-bold">Incidentes más frecuentes</h2>
-        <ul>
-          @for (t of zona.tipos_frecuentes; track t.tipo) {
-            <li>{{ etiquetaTipo[t.tipo] }} ({{ t.cantidad }})</li>
-          }
-        </ul>
-      }
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7">
+          <div class="card p-3 p-sm-4 h-100">
+            <div class="seccion-titulo">
+              <i class="bi bi-bar-chart-line"></i> Incidentes más frecuentes
+            </div>
+            @if (zona.tipos_frecuentes.length) {
+              <div class="lista-barras">
+                @for (t of zona.tipos_frecuentes; track t.tipo) {
+                  <div class="lista-barras-fila">
+                    <span class="text-truncate">{{ etiquetaTipo[t.tipo] }}</span>
+                    <strong>{{ t.cantidad }}</strong>
+                    <span class="barra-heat"
+                      ><span [style.width.%]="anchoTipo(t.cantidad)"></span
+                    ></span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="small text-secondary mb-0">No hay incidentes registrados en el periodo.</p>
+            }
+          </div>
+        </div>
+        <div class="col-12 col-lg-5">
+          <div class="card p-3 p-sm-4 h-100 d-flex flex-column">
+            <div class="seccion-titulo"><i class="bi bi-people"></i> Cómo ayudar</div>
+            <p class="small text-secondary">
+              La seguridad se construye entre todos. Estas son las formas de sumarte:
+            </p>
+            <div class="d-grid gap-2 mt-auto">
+              <a routerLink="/" class="btn btn-soft btn-sm text-start">
+                <i class="bi bi-plus-circle me-2 text-acento"></i>Reportar un incidente
+              </a>
+              <a routerLink="/iniciativas" class="btn btn-soft btn-sm text-start">
+                <i class="bi bi-megaphone me-2 text-acento"></i>Proponer una iniciativa
+              </a>
+              <a routerLink="/reportes" class="btn btn-soft btn-sm text-start">
+                <i class="bi bi-card-checklist me-2 text-acento"></i>Revisar mis reportes
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     }
 
-    <h2 class="h5 fw-bold mt-4">Respuesta de la Municipalidad</h2>
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+      <div>
+        <span class="eyebrow">Respuesta oficial</span>
+        <h2 class="h5 fw-bold mb-0">Lo que hace la Municipalidad</h2>
+      </div>
+      <span class="badge text-bg-light border">{{ d.noticias.length }} acciones registradas</span>
+    </div>
     @if (d.noticias.length === 0) {
-      <div class="vacio"><i class="bi bi-building"></i>La Municipalidad aún no registra acciones en tu barrio.</div>
+      <div class="vacio">
+        <i class="bi bi-building"></i>La Municipalidad aún no registra acciones en tu barrio.
+      </div>
     } @else {
       <div class="row g-3">
         @for (n of d.noticias; track n.id) {
-          <div class="col-12 col-md-6"><app-accion-noticia [accion]="n" [temperaturaActual]="d.zona?.temperatura ?? null" /></div>
+          <div class="col-12 col-md-6">
+            <app-accion-noticia [accion]="n" [temperaturaActual]="d.zona?.temperatura ?? null" />
+          </div>
         }
       </div>
     }

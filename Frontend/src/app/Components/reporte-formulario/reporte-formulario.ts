@@ -59,6 +59,8 @@ export class ReporteFormulario {
 
   protected async enviar(evento: Event): Promise<void> {
     evento.preventDefault();
+    // Evita duplicados por doble clic o por presionar Enter dos veces.
+    if (this.cargando()) return;
     await submit(this.formulario, async () => {
       this.cargando.set(true);
       try {
@@ -70,7 +72,7 @@ export class ReporteFormulario {
         this.avisos.exito(existente ? 'Reporte actualizado.' : 'Reporte enviado de forma anónima.');
         this.guardado.emit();
       } catch (error) {
-        await this.avisos.error(error); // 400 si el punto cae fuera de los barrios, 422 si hay datos inválidos
+        await this.avisos.error(error); // 400 si el punto cae fuera de los barrios, 409 si está repetido
       } finally {
         this.cargando.set(false);
       }

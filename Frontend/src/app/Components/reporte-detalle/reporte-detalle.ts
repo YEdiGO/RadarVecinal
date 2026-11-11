@@ -25,10 +25,13 @@ export class ReporteDetalle implements OnInit {
   readonly id = input.required<string>();
   readonly cerrar = output<void>();
   readonly cambiado = output<void>();
+  /** La Municipalidad quiere responder este reporte con una acción. */
+  readonly responder = output<string>();
 
   protected readonly detalle = signal<Detalle | null>(null);
   protected readonly cargando = signal(true);
   protected readonly errorCarga = signal('');
+  protected readonly enviando = signal(false);
   protected readonly etiqueta = ETIQUETA_TIPO;
 
   async ngOnInit(): Promise<void> {
@@ -48,6 +51,8 @@ export class ReporteDetalle implements OnInit {
   }
 
   protected async votar(voto: 'confirmo' | 'incorrecto'): Promise<void> {
+    if (this.enviando()) return;
+    this.enviando.set(true);
     try {
       await this.reportes.votar(this.id(), voto);
       this.avisos.exito('Gracias por tu valoración.');
@@ -55,23 +60,31 @@ export class ReporteDetalle implements OnInit {
       this.cambiado.emit();
     } catch (error) {
       await this.avisos.error(error); // 409 si ya votaste
+    } finally {
+      this.enviando.set(false);
     }
   }
 
   protected async denunciar(): Promise<void> {
+    if (this.enviando()) return;
     if (!(await this.avisos.confirmar('¿Denunciar este reporte?', 'La Municipalidad lo revisará.', 'Denunciar', true))) return;
+    this.enviando.set(true);
     try {
       await this.reportes.denunciar(this.id());
       this.avisos.exito('Denuncia enviada.');
       await this.cargar(false);
     } catch (error) {
       await this.avisos.error(error);
+    } finally {
+      this.enviando.set(false);
     }
   }
 
   protected async moderar(estado: 'falso' | 'archivado'): Promise<void> {
+    if (this.enviando()) return;
     const texto = estado === 'falso' ? 'Se marcará como falso y dejará de sumar temperatura.' : 'Se archivará y desaparecerá del mapa.';
     if (!(await this.avisos.confirmar('¿Moderar este reporte?', texto, 'Sí, continuar', true))) return;
+    this.enviando.set(true);
     try {
       await this.reportes.moderar(this.id(), estado);
       this.avisos.exito('Reporte actualizado.');
@@ -79,6 +92,8 @@ export class ReporteDetalle implements OnInit {
       this.cerrar.emit();
     } catch (error) {
       await this.avisos.error(error);
+    } finally {
+      this.enviando.set(false);
     }
   }
 }

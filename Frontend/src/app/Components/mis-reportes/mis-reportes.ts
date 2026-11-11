@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ETIQUETA_TIPO } from '../../Interfaces/constantes';
-import { Reporte } from '../../Interfaces/reporte.interface';
+import { Reporte, TipoIncidente } from '../../Interfaces/reporte.interface';
 import { mensajeDeError } from '../../Services/api.service';
 import { NotificacionesService } from '../../Services/notificaciones.service';
 import { ReportesService } from '../../Services/reportes.service';
@@ -12,10 +13,12 @@ import { Modal } from '../modal/modal';
 import { ReporteDetalle } from '../reporte-detalle/reporte-detalle';
 import { ReporteFormulario } from '../reporte-formulario/reporte-formulario';
 
+type Filtro = 'todos' | 'activo' | 'confirmado';
+
 /** CRUD de los reportes del vecino: ver, editar y eliminar. (Crear se hace desde el mapa.) */
 @Component({
   selector: 'app-mis-reportes',
-  imports: [DatePipe, Modal, ReporteFormulario, ReporteDetalle, Cargando, ErrorCarga],
+  imports: [DatePipe, RouterLink, Modal, ReporteFormulario, ReporteDetalle, Cargando, ErrorCarga],
   templateUrl: './mis-reportes.html',
 })
 export class MisReportes implements OnInit {
@@ -28,9 +31,46 @@ export class MisReportes implements OnInit {
   protected readonly editando = signal<Reporte | null>(null);
   protected readonly viendo = signal<string | null>(null);
   protected readonly etiqueta = ETIQUETA_TIPO;
+  protected readonly filtro = signal<Filtro>('todos');
+
+  protected readonly resumen = computed(() => {
+    const lista = this.reportes();
+    return {
+      total: lista.length,
+      activos: lista.filter((r) => r.estado === 'activo').length,
+      confirmados: lista.filter((r) => r.estado === 'confirmado').length,
+    };
+  });
+
+  protected readonly visibles = computed(() => {
+    const filtro = this.filtro();
+    return filtro === 'todos'
+      ? this.reportes()
+      : this.reportes().filter((r) => r.estado === filtro);
+  });
 
   async ngOnInit(): Promise<void> {
     await this.cargar();
+  }
+
+  protected icono(tipo: TipoIncidente): string {
+    const iconos: Record<TipoIncidente, string> = {
+      asalto_robo: 'bi-shield-exclamation',
+      pandillaje: 'bi-people',
+      alcohol_drogas: 'bi-cup-hot',
+      falta_alumbrado: 'bi-lightbulb',
+      actividad_sospechosa: 'bi-eyeglasses',
+      otro: 'bi-three-dots',
+    };
+    return iconos[tipo];
+  }
+
+  protected colorEstado(estado: string): string {
+    return (
+      { activo: 'warning', confirmado: 'success', falso: 'danger', archivado: 'secondary' }[
+        estado
+      ] ?? 'secondary'
+    );
   }
 
   protected async cargar(mostrarCarga = true): Promise<void> {
@@ -46,7 +86,15 @@ export class MisReportes implements OnInit {
   }
 
   protected async eliminar(reporte: Reporte): Promise<void> {
-    if (!(await this.avisos.confirmar('¿Eliminar este reporte?', 'Esta acción no se puede deshacer.', 'Eliminar', true))) return;
+    if (
+      !(await this.avisos.confirmar(
+        '¿Eliminar este reporte?',
+        'Esta acción no se puede deshacer.',
+        'Eliminar',
+        true,
+      ))
+    )
+      return;
     try {
       await this.reportesService.eliminar(reporte.id);
       this.avisos.exito('Reporte eliminado.');

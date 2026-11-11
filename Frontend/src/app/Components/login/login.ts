@@ -28,7 +28,7 @@ export class Login {
 
   protected readonly cargando = signal(false);
 
-  /** Cuentas de demostración (todas con clave 123456) para probar los dos actores. */
+  /** Cuentas de demostración para probar los dos actores: Vecino y Municipalidad. */
   protected readonly cuentasDemo = [
     { correo: 'vecino@barrio.com', actor: 'Vecino' },
     { correo: 'muni@huancayo.gob.pe', actor: 'Municipalidad' },

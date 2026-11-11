@@ -1,4 +1,13 @@
 <form (submit)="enviar($event)" novalidate>
+  @if (reporte(); as r) {
+    <div class="alert alert-info py-2 small d-flex gap-2 align-items-start">
+      <i class="bi bi-link-45deg mt-1" aria-hidden="true"></i>
+      <span>
+        Respondes al reporte <strong>#{{ r.id }}</strong> ({{ etiquetaTipo[r.tipo] }}):
+        <em>"{{ r.descripcion }}"</em>. El vecino verá esta acción en el detalle de su reporte.
+      </span>
+    </div>
+  }
   <div class="row g-3">
     <div class="col-md-6">
       <label for="barrio" class="form-label fw-semibold">Barrio</label>

@@ -1,11 +1,64 @@
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3">
+    <div class="metrica">
+      <span class="metrica-icono azul"><i class="bi bi-geo-alt"></i></span>
+      <div>
+        <div class="metrica-valor">{{ resumen().total }}</div>
+        <div class="metrica-label">Reportes totales</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="metrica">
+      <span class="metrica-icono"><i class="bi bi-map"></i></span>
+      <div>
+        <div class="metrica-valor">{{ resumen().barrios }}</div>
+        <div class="metrica-label">Barrios monitoreados</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="metrica">
+      <span class="metrica-icono rojo"><i class="bi bi-thermometer-full"></i></span>
+      <div>
+        <div class="metrica-valor">{{ resumen().criticos }}</div>
+        <div class="metrica-label">Zonas en alerta</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="metrica">
+      <span class="metrica-icono ambar"><i class="bi bi-fire"></i></span>
+      <div>
+        <div class="metrica-valor" style="font-size: 1.1rem">{{ resumen().caliente }}</div>
+        <div class="metrica-label">Zona más caliente · {{ resumen().temperatura.toFixed(1) }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row g-3">
-  @for (grafico of [{ t: 'Reportes por barrio', d: porBarrio() }, { t: 'Reportes por tipo', d: porTipo() }, { t: 'Reportes por mes', d: porMes() }]; track grafico.t) {
+  @for (
+    grafico of [
+      { t: 'Reportes por barrio', d: porBarrio() },
+      { t: 'Reportes por tipo', d: porTipo() },
+      { t: 'Reportes por mes', d: porMes() },
+    ];
+    track grafico.t
+  ) {
     <div class="col-12 col-lg-4">
       <div class="card p-3 h-100">
-        <h3 class="h6 fw-bold">{{ grafico.t }}</h3>
+        <h3 class="h6 fw-bold">
+          <i class="bi bi-bar-chart-line text-acento me-1"></i>{{ grafico.t }}
+        </h3>
         @for (b of grafico.d; track b.nombre) {
-          <div class="small d-flex justify-content-between"><span>{{ b.nombre }}</span><strong>{{ b.valor }}</strong></div>
-          <div class="progress mb-2" style="height: .5rem"><div class="progress-bar bg-info" [style.width.%]="b.porcentaje"></div></div>
+          <div class="small d-flex justify-content-between">
+            <span class="text-truncate">{{ b.nombre }}</span
+            ><strong>{{ b.valor }}</strong>
+          </div>
+          <div class="progress mb-2" style="height: 0.45rem">
+            <div class="progress-bar" [style.width.%]="b.porcentaje"></div>
+          </div>
         } @empty {
           <p class="small text-secondary mb-0">Sin datos.</p>
         }
@@ -14,15 +67,38 @@
   }
   <div class="col-12">
     <div class="card p-3">
-      <h3 class="h6 fw-bold">Puntos más calientes</h3>
-      <table class="table table-sm mb-0">
-        <thead><tr><th>Barrio</th><th>Coordenadas</th><th class="text-end">Reportes</th><th class="text-end">Temperatura</th></tr></thead>
-        <tbody>
-          @for (p of puntos(); track $index) {
-            <tr><td>{{ nombreBarrio(p.id_barrio) }}</td><td>{{ p.lat.toFixed(3) }}, {{ p.lng.toFixed(3) }}</td><td class="text-end">{{ p.cantidad }}</td><td class="text-end">{{ p.temperatura.toFixed(1) }}</td></tr>
-          }
-        </tbody>
-      </table>
+      <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+        <h3 class="h6 fw-bold mb-0">
+          <i class="bi bi-fire text-acento me-1"></i>Puntos más calientes
+        </h3>
+        <span class="badge text-bg-light border">Top 10</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Barrio</th>
+              <th>Coordenadas</th>
+              <th class="text-end">Reportes</th>
+              <th class="text-end">Temperatura</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of puntos(); track $index) {
+              <tr>
+                <td class="text-secondary">{{ $index + 1 }}</td>
+                <td>{{ nombreBarrio(p.id_barrio) }}</td>
+                <td class="small text-secondary">{{ p.lat.toFixed(3) }}, {{ p.lng.toFixed(3) }}</td>
+                <td class="text-end">{{ p.cantidad }}</td>
+                <td class="text-end">
+                  <span class="badge text-bg-warning">{{ p.temperatura.toFixed(1) }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

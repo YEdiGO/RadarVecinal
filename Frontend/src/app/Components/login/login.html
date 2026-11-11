@@ -1,72 +1,149 @@
-<div class="min-vh-100 bg-radar pantalla-login d-flex flex-column align-items-center justify-content-center px-3 py-5">
-  <div class="w-100 caja">
-    <div class="text-center mb-4">
-      <span class="logo sombra"><i class="bi bi-broadcast-pin"></i></span>
-      <h1 class="h3 fw-bold mt-3 mb-1">Radar Vecinal</h1>
-      <p class="small opacity-75 mb-0">Seguridad ciudadana comunitaria · Huancayo</p>
-    </div>
-
-    <form class="card p-4 sombra text-dark" (submit)="enviar($event)" novalidate>
-      @if (auth.sesionExpirada()) {
-        <div class="alert alert-warning py-2 small d-flex align-items-start gap-2" role="alert">
-          <i class="bi bi-shield-exclamation mt-1"></i>
-          <span>Tu sesión expiró por seguridad. Vuelve a iniciar sesión para continuar.</span>
+<div class="pantalla-login">
+  <div class="login-envoltura">
+    <!-- Presentación -->
+    <section class="login-presentacion">
+      <div class="login-marca">
+        <span class="logo"><i class="bi bi-broadcast-pin"></i></span>
+        <div>
+          <div class="fs-5 fw-bold lh-1">Radar Vecinal</div>
+          <div class="small opacity-50">Seguridad comunitaria</div>
         </div>
-      }
-      <div class="mb-3">
-        <label for="correo" class="form-label fw-semibold">Correo</label>
-        <input
-          id="correo"
-          type="email"
-          class="form-control"
-          autocomplete="email"
-          placeholder="vecino@barrio.com"
-          [formField]="formulario.correo"
-          [class.is-invalid]="formulario.correo().touched() && formulario.correo().invalid()"
-        />
-        @if (formulario.correo().touched() && formulario.correo().invalid()) {
-          <div class="invalid-feedback">{{ formulario.correo().errors()[0].message }}</div>
-        }
       </div>
 
-      <div class="mb-3">
-        <label for="clave" class="form-label fw-semibold">Contraseña</label>
-        <input
-          id="clave"
-          type="password"
-          class="form-control"
-          autocomplete="current-password"
-          placeholder="••••••"
-          [formField]="formulario.clave"
-          [class.is-invalid]="formulario.clave().touched() && formulario.clave().invalid()"
-        />
-        @if (formulario.clave().touched() && formulario.clave().invalid()) {
-          <div class="invalid-feedback">{{ formulario.clave().errors()[0].message }}</div>
-        }
-      </div>
-
-      <button type="submit" class="btn btn-acento btn-lg w-100" [disabled]="cargando()" [attr.aria-busy]="cargando()">
-        @if (cargando()) {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Ingresando…
-        } @else {
-          <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
-        }
-      </button>
-      <p class="text-center small text-secondary mt-3 mb-0">
-        ¿No tienes cuenta? <a routerLink="/registro" class="fw-semibold text-acento">Regístrate</a>
+      <span class="eyebrow eyebrow-claro mt-4">Huancayo · Junín</span>
+      <h1 class="login-titular">La seguridad de tu barrio, <span>en un solo mapa.</span></h1>
+      <p class="login-bajada">
+        Reporta incidentes de forma anónima, sigue la temperatura de tu zona y mira cómo responde la
+        Municipalidad.
       </p>
-    </form>
 
-    <div class="demo mt-4 p-3 small">
-      <p class="fw-semibold mb-2">Cuentas de demostración (clave 123456)</p>
-      @for (cuenta of cuentasDemo; track cuenta.correo) {
-        <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
-          <span class="text-truncate">{{ cuenta.correo }}</span>
-          <button type="button" class="btn btn-sm btn-outline-light rounded-pill" (click)="usarCuenta(cuenta.correo)">
-            {{ cuenta.actor }}
-          </button>
+      <ul class="beneficios">
+        <li>
+          <span class="beneficio-icono"><i class="bi bi-map"></i></span>
+          <span
+            ><strong>Mapa de calor en vivo</strong
+            ><small>Detecta las zonas que necesitan atención.</small></span
+          >
+        </li>
+        <li>
+          <span class="beneficio-icono"><i class="bi bi-shield-check"></i></span>
+          <span
+            ><strong>Respuesta oficial</strong
+            ><small>Sigue las acciones de la Municipalidad.</small></span
+          >
+        </li>
+        <li>
+          <span class="beneficio-icono"><i class="bi bi-people"></i></span>
+          <span
+            ><strong>Comunidad organizada</strong
+            ><small>Propone iniciativas y suma a tus vecinos.</small></span
+          >
+        </li>
+      </ul>
+
+      <div class="mini-mapa" aria-hidden="true">
+        <div class="mini-cuadricula"></div>
+        <span class="mini-zona z1">San Carlos</span>
+        <span class="mini-zona z2">Ocopilla</span>
+        <span class="mini-zona z3">Incho</span>
+        <span class="mini-punto p1"></span>
+        <span class="mini-punto p2"></span>
+        <span class="mini-punto p3"></span>
+        <span class="mini-leyenda"><span class="pulso"></span> 12 barrios monitoreados</span>
+      </div>
+    </section>
+
+    <!-- Formulario -->
+    <section class="login-panel">
+      <div class="caja">
+        <div class="text-center text-md-start mb-4">
+          <span class="eyebrow d-md-none">Radar Vecinal</span>
+          <h2 class="h4 fw-bold mb-1">Bienvenido de vuelta</h2>
+          <p class="small text-secondary mb-0">
+            Ingresa con tu cuenta de vecino o de la Municipalidad.
+          </p>
         </div>
-      }
-    </div>
+
+        <form class="card p-4 sombra text-dark" (submit)="enviar($event)" novalidate>
+          @if (auth.sesionExpirada()) {
+            <div class="alert alert-warning py-2 small d-flex align-items-start gap-2" role="alert">
+              <i class="bi bi-shield-exclamation mt-1"></i>
+              <span>Tu sesión expiró por seguridad. Vuelve a iniciar sesión para continuar.</span>
+            </div>
+          }
+          <div class="mb-3">
+            <label for="correo" class="form-label fw-semibold">Correo</label>
+            <div class="campo-icono">
+              <i class="bi bi-envelope" aria-hidden="true"></i>
+              <input
+                id="correo"
+                type="email"
+                class="form-control"
+                autocomplete="email"
+                placeholder="vecino@barrio.com"
+                [formField]="formulario.correo"
+                [class.is-invalid]="formulario.correo().touched() && formulario.correo().invalid()"
+              />
+            </div>
+            @if (formulario.correo().touched() && formulario.correo().invalid()) {
+              <div class="invalid-feedback">{{ formulario.correo().errors()[0].message }}</div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="clave" class="form-label fw-semibold">Contraseña</label>
+            <div class="campo-icono">
+              <i class="bi bi-lock" aria-hidden="true"></i>
+              <input
+                id="clave"
+                type="password"
+                class="form-control"
+                autocomplete="current-password"
+                placeholder="••••••"
+                [formField]="formulario.clave"
+                [class.is-invalid]="formulario.clave().touched() && formulario.clave().invalid()"
+              />
+            </div>
+            @if (formulario.clave().touched() && formulario.clave().invalid()) {
+              <div class="invalid-feedback">{{ formulario.clave().errors()[0].message }}</div>
+            }
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-acento btn-lg w-100"
+            [disabled]="cargando()"
+            [attr.aria-busy]="cargando()"
+          >
+            @if (cargando()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span
+              >Ingresando…
+            } @else {
+              <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+            }
+          </button>
+          <p class="text-center small text-secondary mt-3 mb-0">
+            ¿No tienes cuenta?
+            <a routerLink="/registro" class="fw-semibold text-acento">Regístrate</a>
+          </p>
+        </form>
+
+        <div class="demo mt-3 p-3 small">
+          <p class="fw-semibold mb-2"><i class="bi bi-stars me-1"></i>Cuentas de demostración</p>
+          @for (cuenta of cuentasDemo; track cuenta.correo) {
+            <div class="demo-fila">
+              <span class="text-truncate">{{ cuenta.correo }}</span>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-light rounded-pill"
+                (click)="usarCuenta(cuenta.correo)"
+              >
+                {{ cuenta.actor }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
   </div>
 </div>

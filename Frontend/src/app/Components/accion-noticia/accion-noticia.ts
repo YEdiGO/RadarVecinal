@@ -15,6 +15,32 @@ export class AccionNoticia {
   readonly temperaturaActual = input<number | null>(null);
 
   protected colorEstado(estado: string): string {
-    return estado === 'Completada' ? 'success' : estado === 'En ejecución' ? 'warning' : 'secondary';
+    return estado === 'Completada'
+      ? 'success'
+      : estado === 'En ejecución'
+        ? 'warning'
+        : 'secondary';
+  }
+
+  protected iconoTipo(tipo: string): string {
+    return (
+      {
+        'Patrullaje de serenazgo': 'bi-shield-check',
+        'Operativo con la policía': 'bi-badge-shield',
+        Alumbrado: 'bi-lightbulb',
+        'Campaña de prevención': 'bi-megaphone',
+      }[tipo] ?? 'bi-tools'
+    );
+  }
+
+  protected ancho(temperatura: number): number {
+    return Math.min(100, Math.max(4, (temperatura / 45) * 100));
+  }
+
+  protected nivel(temperatura: number): string {
+    if (temperatura > 30) return 'rojo';
+    if (temperatura >= 18) return 'naranja';
+    if (temperatura >= 8) return 'amarillo';
+    return 'verde';
   }
 }

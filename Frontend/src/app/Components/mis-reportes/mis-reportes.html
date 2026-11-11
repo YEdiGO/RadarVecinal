@@ -1,42 +1,147 @@
-<div class="container py-4" style="max-width: 56rem">
+<div class="container py-4" style="max-width: 58rem">
   <div class="pagina-encabezado mb-3">
     <div>
       <span class="eyebrow">Mi actividad</span>
       <h1 class="h3 fw-bold mb-1">Mis reportes</h1>
-      <p class="text-secondary mb-0">Tus reportes son anónimos para los demás vecinos. Aquí puedes editarlos o eliminarlos.</p>
+      <p class="text-secondary mb-0">
+        Tus reportes son anónimos para los demás vecinos. Aquí puedes editarlos o eliminarlos.
+      </p>
     </div>
+    <a routerLink="/" class="btn btn-acento"><i class="bi bi-plus-circle me-1"></i>Reportar</a>
   </div>
 
   @if (cargando()) {
     <app-cargando mensaje="Cargando tus reportes…" />
   } @else if (errorCarga()) {
     <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
-  } @else if (reportes().length === 0) {
-    <div class="vacio"><i class="bi bi-card-checklist"></i>Aún no has enviado reportes. Hazlo desde el mapa.</div>
   } @else {
-    <div class="d-grid gap-2">
-      @for (r of reportes(); track r.id) {
-        <div class="card card-interactiva p-3 d-flex flex-row align-items-center gap-3">
-          <span class="icono-tipo" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>
-          <div class="flex-grow-1 min-w-0">
-            <div class="fw-semibold">{{ etiqueta[r.tipo] }} <span class="badge text-bg-secondary text-capitalize ms-1">{{ r.estado }}</span></div>
-            <div class="small text-secondary text-truncate">{{ r.descripcion }}</div>
-            <div class="small text-secondary">{{ r.fecha | date: 'dd/MM/yyyy HH:mm' }} · {{ r.confirmaciones }} confirmaciones</div>
-          </div>
-          <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary" aria-label="Ver" (click)="viendo.set(r.id)"><i class="bi bi-eye"></i></button>
-            <button class="btn btn-sm btn-outline-secondary" aria-label="Editar" (click)="editando.set(r)"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-outline-danger" aria-label="Eliminar" (click)="eliminar(r)"><i class="bi bi-trash"></i></button>
+    <div class="row g-3 mb-3">
+      <div class="col-4">
+        <div class="metrica">
+          <span class="metrica-icono azul"><i class="bi bi-collection"></i></span>
+          <div>
+            <div class="metrica-valor">{{ resumen().total }}</div>
+            <div class="metrica-label">Totales</div>
           </div>
         </div>
-      }
+      </div>
+      <div class="col-4">
+        <div class="metrica">
+          <span class="metrica-icono ambar"><i class="bi bi-hourglass-split"></i></span>
+          <div>
+            <div class="metrica-valor">{{ resumen().activos }}</div>
+            <div class="metrica-label">Activos</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="metrica">
+          <span class="metrica-icono"><i class="bi bi-patch-check"></i></span>
+          <div>
+            <div class="metrica-valor">{{ resumen().confirmados }}</div>
+            <div class="metrica-label">Confirmados</div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div class="pill-grupo" role="group" aria-label="Filtrar reportes">
+        <button
+          type="button"
+          class="pill-filtro"
+          [class.activo]="filtro() === 'todos'"
+          (click)="filtro.set('todos')"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          class="pill-filtro"
+          [class.activo]="filtro() === 'activo'"
+          (click)="filtro.set('activo')"
+        >
+          Activos
+        </button>
+        <button
+          type="button"
+          class="pill-filtro"
+          [class.activo]="filtro() === 'confirmado'"
+          (click)="filtro.set('confirmado')"
+        >
+          Confirmados
+        </button>
+      </div>
+      <span class="small text-secondary">{{ visibles().length }} resultados</span>
+    </div>
+
+    @if (reportes().length === 0) {
+      <div class="vacio">
+        <i class="bi bi-card-checklist"></i>
+        Aún no has enviado reportes. Hazlo desde el mapa.
+        <div class="mt-3"><a routerLink="/" class="btn btn-acento btn-sm">Ir al mapa</a></div>
+      </div>
+    } @else if (visibles().length === 0) {
+      <div class="vacio"><i class="bi bi-funnel"></i>No hay reportes con este filtro.</div>
+    } @else {
+      <div class="d-grid gap-2">
+        @for (r of visibles(); track r.id) {
+          <div class="card card-interactiva p-3 d-flex flex-row align-items-center gap-3">
+            <span class="icono-tipo" aria-hidden="true"
+              ><i class="bi {{ icono(r.tipo) }}"></i
+            ></span>
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="fw-semibold">{{ etiqueta[r.tipo] }}</span>
+                <span class="badge text-bg-{{ colorEstado(r.estado) }} text-capitalize">{{
+                  r.estado
+                }}</span>
+                <span class="badge text-bg-light border">Gravedad {{ r.gravedad }}</span>
+              </div>
+              <div class="small text-secondary text-truncate">{{ r.descripcion }}</div>
+              <div class="small text-secondary">
+                <i class="bi bi-calendar3 me-1"></i>{{ r.fecha | date: 'dd/MM/yyyy HH:mm' }}
+                <span class="mx-1">·</span>
+                <i class="bi bi-hand-thumbs-up me-1"></i>{{ r.confirmaciones }} confirmaciones
+              </div>
+            </div>
+            <div class="btn-group">
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                aria-label="Ver"
+                (click)="viendo.set(r.id)"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                aria-label="Editar"
+                (click)="editando.set(r)"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                aria-label="Eliminar"
+                (click)="eliminar(r)"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
   }
 </div>
 
 @if (editando(); as reporte) {
   <app-modal titulo="Editar reporte" (cerrar)="editando.set(null)">
-    <app-reporte-formulario [reporte]="reporte" (guardado)="guardado()" (cancelado)="editando.set(null)" />
+    <app-reporte-formulario
+      [reporte]="reporte"
+      (guardado)="guardado()"
+      (cancelado)="editando.set(null)"
+    />
   </app-modal>
 }
 @if (viendo(); as id) {

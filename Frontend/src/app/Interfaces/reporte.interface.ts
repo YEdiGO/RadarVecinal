@@ -1,3 +1,5 @@
+import { Accion } from './accion.interface';
+
 export type TipoIncidente =
   | 'asalto_robo'
   | 'pandillaje'
@@ -21,6 +23,8 @@ export interface ReportePublico {
   fecha: string;
   estado: EstadoReporte;
   confirmaciones: number;
+  /** Cuántos vecinos lo denunciaron para revisión. */
+  denuncias: number;
 }
 
 /** Reporte propio (incluye id_usuario). */
@@ -33,6 +37,8 @@ export interface ReporteDetalle extends ReportePublico {
   mi_voto: VotoReporte | null;
   denunciado: boolean;
   incorrectos: number;
+  /** Respuestas oficiales de la Municipalidad a este reporte. */
+  acciones: Accion[];
 }
 
 /** Datos que se envían al crear o editar un reporte. */

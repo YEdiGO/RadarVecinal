@@ -1,27 +1,58 @@
-<div class="container py-4" style="max-width: 44rem">
-  <a routerLink="/iniciativas" class="text-decoration-none small"><i class="bi bi-arrow-left me-1"></i>Volver</a>
+<div class="container py-4" style="max-width: 46rem">
+  <a routerLink="/iniciativas" class="text-decoration-none small"
+    ><i class="bi bi-arrow-left me-1"></i>Volver</a
+  >
   @if (cargando()) {
     <app-cargando mensaje="Cargando la iniciativa…" />
   } @else if (errorCarga()) {
     <app-error-carga [mensaje]="errorCarga()" (reintentar)="cargar()" />
   } @else if (iniciativa(); as i) {
     <div class="card p-4 mt-3">
-      <span class="eyebrow">Iniciativa vecinal</span>
-      <div class="d-flex justify-content-between gap-2">
-        <h1 class="h4 fw-bold">{{ i.titulo }}</h1>
-        <span class="badge text-bg-dark align-self-start">{{ i.estado }}</span>
+      <div class="d-flex align-items-start gap-2 mb-2">
+        <span class="icono-redondo"><i class="bi bi-megaphone"></i></span>
+        <div class="flex-grow-1">
+          <span class="eyebrow">Iniciativa vecinal</span>
+          <div class="d-flex justify-content-between gap-2 flex-wrap">
+            <h1 class="h4 fw-bold mb-1">{{ i.titulo }}</h1>
+            <span class="badge text-bg-dark align-self-start">{{ i.estado }}</span>
+          </div>
+        </div>
       </div>
+
       <p>{{ i.descripcion }}</p>
-      <p class="small text-secondary mb-1"><strong>Meta:</strong> {{ i.meta }}</p>
-      <p class="small text-secondary"><i class="bi bi-people me-1"></i>{{ i.participantes }} participantes</p>
+
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <div class="tarjeta-suave p-2 text-center">
+            <div class="fw-bold">{{ i.meta }}</div>
+            <div class="small text-secondary">Meta</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="tarjeta-suave p-2 text-center">
+            <div class="fw-bold">{{ i.participantes }}</div>
+            <div class="small text-secondary">Participantes</div>
+          </div>
+        </div>
+      </div>
+
       @if (i.estado === 'Cumplida' && i.temperatura_al_cumplir !== null) {
-        <p class="small bg-light rounded p-2"><i class="bi bi-thermometer-half me-1"></i>Temperatura del barrio al cumplirse: <strong>{{ i.temperatura_al_cumplir.toFixed(1) }}</strong></p>
+        <p class="small bg-light rounded p-2">
+          <i class="bi bi-thermometer-half me-1"></i>Temperatura del barrio al cumplirse:
+          <strong>{{ i.temperatura_al_cumplir.toFixed(1) }}</strong>
+        </p>
       }
       <div class="d-flex flex-wrap gap-2">
-        <button class="btn btn-acento" [disabled]="i.sumado" (click)="sumarse()">{{ i.sumado ? 'Ya participas' : 'Sumarme' }}</button>
+        <button class="btn btn-acento" [disabled]="i.sumado" (click)="sumarse()">
+          <i class="bi bi-people me-1"></i>{{ i.sumado ? 'Ya participas' : 'Sumarme' }}
+        </button>
         @if (i.es_mia) {
-          <button class="btn btn-outline-secondary" (click)="editando.set(true)"><i class="bi bi-pencil me-1"></i>Editar</button>
-          <button class="btn btn-outline-danger" (click)="eliminar()"><i class="bi bi-trash me-1"></i>Eliminar</button>
+          <button class="btn btn-outline-secondary" (click)="editando.set(true)">
+            <i class="bi bi-pencil me-1"></i>Editar
+          </button>
+          <button class="btn btn-outline-danger" (click)="eliminar()">
+            <i class="bi bi-trash me-1"></i>Eliminar
+          </button>
         }
       </div>
     </div>
@@ -30,6 +61,10 @@
 
 @if (editando() && iniciativa(); as i) {
   <app-modal titulo="Editar iniciativa" (cerrar)="editando.set(false)">
-    <app-iniciativa-formulario [iniciativa]="i" (guardado)="guardado()" (cancelado)="editando.set(false)" />
+    <app-iniciativa-formulario
+      [iniciativa]="i"
+      (guardado)="guardado()"
+      (cancelado)="editando.set(false)"
+    />
   </app-modal>
 }

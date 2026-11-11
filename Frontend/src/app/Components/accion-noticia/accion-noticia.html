@@ -1,21 +1,53 @@
 <div class="card p-3 h-100">
-  <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-    <h3 class="h6 fw-bold mb-0">{{ accion().titulo }}</h3>
-    <span class="badge text-bg-{{ colorEstado(accion().estado) }}">{{ accion().estado }}</span>
+  <div class="d-flex align-items-start gap-2 mb-2">
+    <span class="icono-redondo" aria-hidden="true"
+      ><i class="bi {{ iconoTipo(accion().tipo) }}"></i
+    ></span>
+    <div class="flex-grow-1 min-w-0">
+      <div class="d-flex align-items-start justify-content-between gap-2">
+        <h3 class="h6 fw-bold mb-0">{{ accion().titulo }}</h3>
+        <span class="badge text-bg-{{ colorEstado(accion().estado) }}">{{ accion().estado }}</span>
+      </div>
+      <p class="small text-secondary mb-0">
+        {{ accion().institucion }} · {{ accion().tipo }} · {{ accion().fecha | date: 'dd/MM/yyyy' }}
+      </p>
+    </div>
   </div>
-  <p class="small text-secondary mb-2">{{ accion().institucion }} · {{ accion().tipo }} · {{ accion().fecha | date: 'dd/MM/yyyy' }}</p>
+
   <p class="small mb-2">{{ accion().descripcion }}</p>
+
   @if (accion().fotos.length) {
     <div class="d-flex gap-2 flex-wrap mb-2">
       @for (foto of accion().fotos; track $index) {
-        <img [src]="foto" alt="Foto de la acción" class="rounded" style="height: 64px; width: 64px; object-fit: cover" />
+        <img
+          [src]="foto"
+          alt="Foto de la acción"
+          class="rounded"
+          style="height: 64px; width: 64px; object-fit: cover"
+        />
       }
     </div>
   }
+
   @if (accion().estado === 'Completada' && accion().temperatura_al_completar !== null) {
-    <div class="small bg-light rounded p-2">
-      <i class="bi bi-thermometer-half me-1"></i>Antes: <strong>{{ accion().temperatura_al_completar!.toFixed(1) }}</strong>
-      @if (temperaturaActual() !== null) { · Ahora: <strong>{{ temperaturaActual()!.toFixed(1) }}</strong> }
+    <div class="accion-comparativa mt-auto">
+      <div class="flex-fill">
+        <div class="small text-secondary">Antes</div>
+        <div class="fw-bold">{{ accion().temperatura_al_completar!.toFixed(1) }}</div>
+        <div class="barra-heat nivel-{{ nivel(accion().temperatura_al_completar!) }}">
+          <span [style.width.%]="ancho(accion().temperatura_al_completar!)"></span>
+        </div>
+      </div>
+      @if (temperaturaActual() !== null) {
+        <i class="bi bi-arrow-right text-acento" aria-hidden="true"></i>
+        <div class="flex-fill">
+          <div class="small text-secondary">Ahora</div>
+          <div class="fw-bold">{{ temperaturaActual()!.toFixed(1) }}</div>
+          <div class="barra-heat nivel-{{ nivel(temperaturaActual()!) }}">
+            <span [style.width.%]="ancho(temperaturaActual()!)"></span>
+          </div>
+        </div>
+      }
     </div>
   }
 </div>

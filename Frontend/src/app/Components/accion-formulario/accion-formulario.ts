@@ -3,7 +3,8 @@ import { FormField, form, maxLength, required, submit } from '@angular/forms/sig
 
 import { Accion, EstadoAccion, TipoAccion } from '../../Interfaces/accion.interface';
 import { Barrio } from '../../Interfaces/barrio.interface';
-import { ESTADOS_ACCION, TIPOS_ACCION } from '../../Interfaces/constantes';
+import { ReportePublico } from '../../Interfaces/reporte.interface';
+import { ESTADOS_ACCION, ETIQUETA_TIPO, TIPOS_ACCION } from '../../Interfaces/constantes';
 import { AccionesService } from '../../Services/acciones.service';
 import { NotificacionesService } from '../../Services/notificaciones.service';
 import { ZonasService } from '../../Services/zonas.service';
@@ -24,12 +25,15 @@ export class AccionFormulario implements OnInit {
 
   readonly accion = input<Accion | null>(null);
   readonly barrioInicial = input<string>('');
+  /** Si viene un reporte, la acción se registra como respuesta oficial a ese caso. */
+  readonly reporte = input<ReportePublico | null>(null);
   readonly guardado = output<void>();
   readonly cancelado = output<void>();
 
   protected readonly barrios = signal<Barrio[]>([]);
   protected readonly tipos = TIPOS_ACCION;
   protected readonly estados = ESTADOS_ACCION;
+  protected readonly etiquetaTipo = ETIQUETA_TIPO;
   protected readonly cargando = signal(false);
 
   protected readonly modelo = signal({
@@ -40,6 +44,7 @@ export class AccionFormulario implements OnInit {
     fecha: new Date().toLocaleDateString('en-CA'), // AAAA-MM-DD en hora local
     estado: 'Planificada',
     fotos: [] as string[],
+    id_reporte: null as string | null,
   });
 
   protected readonly formulario = form(this.modelo, (c) => {
@@ -55,12 +60,24 @@ export class AccionFormulario implements OnInit {
     effect(() => {
       const a = this.accion();
       const barrio = this.barrioInicial();
+      const reporte = this.reporte();
       untracked(() => {
         if (a) {
           this.modelo.set({
             id_barrio: a.id_barrio, tipo: a.tipo, titulo: a.titulo, descripcion: a.descripcion,
             fecha: a.fecha.slice(0, 10), estado: a.estado, fotos: a.fotos,
+            id_reporte: a.id_reporte,
           });
+        } else if (reporte) {
+          this.modelo.update((m) => ({
+            ...m,
+            id_barrio: reporte.id_barrio,
+            id_reporte: reporte.id,
+            titulo: m.titulo || `Respuesta a: ${ETIQUETA_TIPO[reporte.tipo]}`,
+            descripcion:
+              m.descripcion ||
+              `Atención al reporte "${reporte.descripcion}" (${reporte.id}).`,
+          }));
         } else if (barrio) {
           this.modelo.update((m) => ({ ...m, id_barrio: barrio }));
         }
@@ -106,6 +123,8 @@ export class AccionFormulario implements OnInit {
 
   protected async enviar(evento: Event): Promise<void> {
     evento.preventDefault();
+    // Evita guardar dos veces si se presiona Enter o se hace doble clic.
+    if (this.cargando()) return;
     await submit(this.formulario, async () => {
       this.cargando.set(true);
       try {
@@ -116,7 +135,15 @@ export class AccionFormulario implements OnInit {
         else await this.acciones.crear(datos);
         this.avisos.exito(existente ? 'Acción actualizada.' : 'Acción registrada.');
         this.guardado.emit();
-        if (!existente) this.modelo.update((x) => ({ ...x, titulo: '', descripcion: '', fotos: [] }));
+        if (!existente) {
+          this.modelo.update((x) => ({
+            ...x,
+            titulo: '',
+            descripcion: '',
+            fotos: [],
+            id_reporte: null,
+          }));
+        }
       } catch (error) {
         await this.avisos.error(error);
       } finally {

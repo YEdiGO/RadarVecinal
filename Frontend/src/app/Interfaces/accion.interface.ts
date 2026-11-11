@@ -19,6 +19,8 @@ export interface Accion {
   fecha: string;
   estado: EstadoAccion;
   fotos: string[];
+  /** Reporte ciudadano al que responde esta acción, si aplica. */
+  id_reporte: string | null;
   fecha_registro: string | null;
   temperatura_al_completar: number | null;
 }
@@ -32,4 +34,6 @@ export interface AccionDatos {
   fecha: string;
   estado: EstadoAccion;
   fotos: string[];
+  /** Opcional: respuesta a un reporte concreto. */
+  id_reporte?: string | null;
 }

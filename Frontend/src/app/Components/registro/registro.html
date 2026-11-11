@@ -1,91 +1,155 @@
-<div class="min-vh-100 d-flex align-items-center justify-content-center px-3 py-5 pantalla-registro">
-  <div class="w-100 tarjeta-registro" style="max-width: 27rem">
-    <div class="d-flex align-items-center gap-2 fs-3 fw-bold text-radar mb-4">
-      <i class="bi bi-broadcast-pin text-acento"></i> Radar Vecinal
-    </div>
-    <h1 class="h4 fw-semibold mb-4">Crear cuenta de vecino</h1>
-
-    <form (submit)="enviar($event)" novalidate>
-      <div class="mb-3">
-        <label for="nombre" class="form-label fw-semibold">Nombre completo</label>
-        <input
-          id="nombre"
-          class="form-control"
-          [formField]="formulario.nombre"
-          [class.is-invalid]="formulario.nombre().touched() && formulario.nombre().invalid()"
-        />
-        @if (formulario.nombre().touched() && formulario.nombre().invalid()) {
-          <div class="invalid-feedback">{{ formulario.nombre().errors()[0].message }}</div>
-        }
+<div class="pantalla-registro">
+  <div class="registro-envoltura">
+    <aside class="registro-lateral">
+      <div class="d-flex align-items-center gap-2 fs-4 fw-bold text-white">
+        <i class="bi bi-broadcast-pin text-acento"></i> Radar Vecinal
       </div>
-
-      <div class="mb-3">
-        <label for="correo" class="form-label fw-semibold">Correo</label>
-        <input
-          id="correo"
-          type="email"
-          class="form-control"
-          [formField]="formulario.correo"
-          [class.is-invalid]="formulario.correo().touched() && formulario.correo().invalid()"
-        />
-        @if (formulario.correo().touched() && formulario.correo().invalid()) {
-          <div class="invalid-feedback">{{ formulario.correo().errors()[0].message }}</div>
-        }
-      </div>
-
-      <div class="mb-3">
-        <label for="clave" class="form-label fw-semibold">Contraseña</label>
-        <input
-          id="clave"
-          type="password"
-          class="form-control"
-          [formField]="formulario.clave"
-          [class.is-invalid]="formulario.clave().touched() && formulario.clave().invalid()"
-        />
-        @if (formulario.clave().touched() && formulario.clave().invalid()) {
-          <div class="invalid-feedback">{{ formulario.clave().errors()[0].message }}</div>
-        }
-      </div>
-
-      <div class="mb-3">
-        <label for="barrio" class="form-label fw-semibold">Tu barrio</label>
-        <select
-          id="barrio"
-          class="form-select"
-          [formField]="formulario.id_barrio"
-          [class.is-invalid]="formulario.id_barrio().touched() && formulario.id_barrio().invalid()"
-        >
-          <option value="">{{ cargandoBarrios() ? 'Cargando barrios…' : 'Selecciona tu barrio' }}</option>
-          @for (barrio of barrios(); track barrio.id) {
-            <option [value]="barrio.id">{{ barrio.nombre }}</option>
-          }
-        </select>
-        @if (formulario.id_barrio().touched() && formulario.id_barrio().invalid()) {
-          <div class="invalid-feedback">{{ formulario.id_barrio().errors()[0].message }}</div>
-        }
-        @if (errorBarrios()) {
-          <div class="text-danger small mt-1" role="alert">
-            No pudimos cargar los barrios.
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="cargarBarrios()">Reintentar</button>
-          </div>
-        }
-      </div>
-
-      <p class="small text-secondary">
-        <i class="bi bi-info-circle me-1"></i>Tu cuenta quedará pendiente hasta que la Municipalidad la verifique.
+      <span class="eyebrow eyebrow-claro mt-4">Únete a la red</span>
+      <h2 class="registro-titular">Tu voz ayuda a cuidar el barrio.</h2>
+      <p class="registro-bajada">
+        Crea tu cuenta, verifica tu barrio con la Municipalidad y empieza a reportar y proponer
+        mejoras junto a tus vecinos.
       </p>
+      <ol class="pasos">
+        <li>
+          <span>1</span>
+          <div><strong>Crea tu cuenta</strong><small>Con tu nombre, correo y barrio.</small></div>
+        </li>
+        <li>
+          <span>2</span>
+          <div>
+            <strong>Verificación municipal</strong
+            ><small>La Municipalidad revisa tu solicitud.</small>
+          </div>
+        </li>
+        <li>
+          <span>3</span>
+          <div>
+            <strong>Participa</strong><small>Reporta incidentes e impulsa iniciativas.</small>
+          </div>
+        </li>
+      </ol>
+      <p class="registro-nota">
+        <i class="bi bi-shield-lock me-1"></i>Tus datos personales no se muestran en el mapa.
+      </p>
+    </aside>
 
-      <button type="submit" class="btn btn-acento btn-lg w-100" [disabled]="cargando()" [attr.aria-busy]="cargando()">
-        @if (cargando()) {
-          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Registrando…
-        } @else {
-          Registrarme
-        }
-      </button>
-    </form>
+    <section class="registro-panel">
+      <div class="w-100 tarjeta-registro">
+        <div class="d-flex align-items-center gap-2 fs-5 fw-bold text-radar mb-1 d-md-none">
+          <i class="bi bi-broadcast-pin text-acento"></i> Radar Vecinal
+        </div>
+        <h1 class="h4 fw-bold mb-1">Crear cuenta de vecino</h1>
+        <p class="small text-secondary mb-4">
+          Solo toma un minuto. Luego la Municipalidad verificará tu barrio.
+        </p>
 
-    <p class="text-center small mt-4">
-      ¿Ya tienes cuenta? <a routerLink="/login" class="fw-semibold text-acento">Ingresa</a>
-    </p>
+        <form (submit)="enviar($event)" novalidate>
+          <div class="mb-3">
+            <label for="nombre" class="form-label fw-semibold">Nombre completo</label>
+            <input
+              id="nombre"
+              class="form-control"
+              placeholder="Ej. Rosa Quispe"
+              [formField]="formulario.nombre"
+              [class.is-invalid]="formulario.nombre().touched() && formulario.nombre().invalid()"
+            />
+            @if (formulario.nombre().touched() && formulario.nombre().invalid()) {
+              <div class="invalid-feedback">{{ formulario.nombre().errors()[0].message }}</div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="correo" class="form-label fw-semibold">Correo</label>
+            <input
+              id="correo"
+              type="email"
+              class="form-control"
+              placeholder="tucorreo@ejemplo.com"
+              [formField]="formulario.correo"
+              [class.is-invalid]="formulario.correo().touched() && formulario.correo().invalid()"
+            />
+            @if (formulario.correo().touched() && formulario.correo().invalid()) {
+              <div class="invalid-feedback">{{ formulario.correo().errors()[0].message }}</div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="clave" class="form-label fw-semibold">Contraseña</label>
+            <input
+              id="clave"
+              type="password"
+              class="form-control"
+              placeholder="Mínimo 6 caracteres"
+              [formField]="formulario.clave"
+              [class.is-invalid]="formulario.clave().touched() && formulario.clave().invalid()"
+            />
+            @if (formulario.clave().touched() && formulario.clave().invalid()) {
+              <div class="invalid-feedback">{{ formulario.clave().errors()[0].message }}</div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="barrio" class="form-label fw-semibold">Tu barrio</label>
+            <select
+              id="barrio"
+              class="form-select"
+              [formField]="formulario.id_barrio"
+              [class.is-invalid]="
+                formulario.id_barrio().touched() && formulario.id_barrio().invalid()
+              "
+            >
+              <option value="">
+                {{ cargandoBarrios() ? 'Cargando barrios…' : 'Selecciona tu barrio' }}
+              </option>
+              @for (barrio of barrios(); track barrio.id) {
+                <option [value]="barrio.id">{{ barrio.nombre }}</option>
+              }
+            </select>
+            @if (formulario.id_barrio().touched() && formulario.id_barrio().invalid()) {
+              <div class="invalid-feedback">{{ formulario.id_barrio().errors()[0].message }}</div>
+            }
+            @if (errorBarrios()) {
+              <div class="text-danger small mt-1" role="alert">
+                No pudimos cargar los barrios.
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm p-0 align-baseline"
+                  (click)="cargarBarrios()"
+                >
+                  Reintentar
+                </button>
+              </div>
+            }
+          </div>
+
+          <div class="aviso-urgencia mb-3">
+            <span class="icono-redondo ambar"><i class="bi bi-hourglass-split"></i></span>
+            <p class="small mb-0 text-secondary">
+              Tu cuenta quedará <strong>pendiente</strong> hasta que la Municipalidad la verifique.
+              Te avisaremos al entrar.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-acento btn-lg w-100"
+            [disabled]="cargando()"
+            [attr.aria-busy]="cargando()"
+          >
+            @if (cargando()) {
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span
+              >Registrando…
+            } @else {
+              <i class="bi bi-person-plus me-1"></i>Registrarme
+            }
+          </button>
+        </form>
+
+        <p class="text-center small mt-4 mb-0">
+          ¿Ya tienes cuenta? <a routerLink="/login" class="fw-semibold text-acento">Ingresa</a>
+        </p>
+      </div>
+    </section>
   </div>
 </div>

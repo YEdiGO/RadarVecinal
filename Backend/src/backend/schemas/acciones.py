@@ -31,6 +31,8 @@ class AccionBase(BaseModel):
     fecha: date
     estado: EstadoAccion
     fotos: list[str] = Field(default_factory=list, max_length=MAX_FOTOS)
+    # Reporte ciudadano al que responde esta acción (opcional): cierra el círculo vecino↔Municipalidad.
+    id_reporte: str | None = Field(default=None, max_length=80)
 
     @field_validator("fotos")
     @classmethod
@@ -66,5 +68,6 @@ class Accion(BaseModel):
     fecha: datetime
     estado: EstadoAccion
     fotos: list[str]
+    id_reporte: str | None = None
     fecha_registro: datetime | None = None
     temperatura_al_completar: float | None = None

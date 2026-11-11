@@ -2,40 +2,128 @@
   @if (cargando()) {
     <app-cargando mensaje="Cargando el reporte…" />
   } @else if (errorCarga()) {
-    <app-error-carga [titulo]="'No pudimos abrir el reporte'" [mensaje]="errorCarga()" (reintentar)="cargar()" />
+    <app-error-carga
+      [titulo]="'No pudimos abrir el reporte'"
+      [mensaje]="errorCarga()"
+      (reintentar)="cargar()"
+    />
   } @else if (detalle(); as d) {
-    <div class="d-flex flex-wrap gap-2 mb-2">
-      <span class="badge text-bg-dark">{{ etiqueta[d.tipo] }}</span>
-      <span class="badge text-bg-secondary text-capitalize">{{ d.estado }}</span>
-      <span class="badge text-bg-light border">Gravedad {{ d.gravedad }}</span>
+    <div class="d-flex align-items-start gap-2 mb-3">
+      <span class="icono-redondo rojo" aria-hidden="true"><i class="bi bi-geo-alt"></i></span>
+      <div class="min-w-0">
+        <div class="fw-bold">{{ etiqueta[d.tipo] }}</div>
+        <div class="small text-secondary">{{ d.fecha | date: 'dd/MM/yyyy HH:mm' }}</div>
+      </div>
+      <span class="badge text-bg-secondary text-capitalize ms-auto">{{ d.estado }}</span>
     </div>
+
+    <div class="row g-2 mb-3">
+      <div class="col-4">
+        <div class="tarjeta-suave p-2 text-center">
+          <div class="fw-bold">{{ d.gravedad }}</div>
+          <div class="small text-secondary">Gravedad</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="tarjeta-suave p-2 text-center">
+          <div class="fw-bold">{{ d.confirmaciones }}</div>
+          <div class="small text-secondary">Confirmaciones</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="tarjeta-suave p-2 text-center">
+          <div class="fw-bold">{{ d.incorrectos }}</div>
+          <div class="small text-secondary">Incorrectos</div>
+        </div>
+      </div>
+    </div>
+
     <p class="fs-6">{{ d.descripcion }}</p>
-    <p class="small text-secondary mb-3">
-      {{ d.fecha | date: 'dd/MM/yyyy HH:mm' }} · {{ d.confirmaciones }} confirmaciones · {{ d.incorrectos }} "incorrecto"
-    </p>
+
+    @if (d.acciones.length) {
+      <div class="tarjeta-suave p-3 mb-3">
+        <div class="small fw-bold text-acento mb-2">
+          <i class="bi bi-shield-check me-1" aria-hidden="true"></i>Respuesta de la Municipalidad
+        </div>
+        @for (a of d.acciones; track a.id) {
+          <div class="d-flex align-items-start gap-2" [class.mb-2]="!$last">
+            <i class="bi bi-tools text-secondary mt-1" aria-hidden="true"></i>
+            <div class="min-w-0">
+              <div class="fw-semibold">{{ a.titulo }}</div>
+              <div class="small text-secondary">
+                {{ a.estado }} · {{ a.fecha | date: 'dd/MM/yyyy' }}
+              </div>
+              <div class="small">{{ a.descripcion }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
     @if (auth.esVecino()) {
       @if (d.propio) {
-        <div class="alert alert-info py-2 small mb-0">Este reporte es tuyo; edítalo o elimínalo desde "Mis reportes".</div>
+        <div class="alert alert-info py-2 small mb-0">
+          Este reporte es tuyo; edítalo o elimínalo desde "Mis reportes".
+        </div>
       } @else {
         @if (d.mi_voto) {
-          <div class="alert alert-secondary py-2 small">Tu valoración: <strong>{{ d.mi_voto }}</strong></div>
+          <div class="alert alert-secondary py-2 small">
+            Tu valoración: <strong>{{ d.mi_voto }}</strong>. Gracias por ayudar a la comunidad.
+          </div>
+        } @else if (d.estado === 'falso' || d.estado === 'archivado') {
+          <div class="alert alert-warning py-2 small">
+            La Municipalidad descartó este reporte; ya no se puede valorar.
+          </div>
         } @else {
           <div class="d-flex gap-2 mb-2">
-            <button class="btn btn-success flex-fill" (click)="votar('confirmo')"><i class="bi bi-hand-thumbs-up me-1"></i>Lo confirmo</button>
-            <button class="btn btn-outline-secondary flex-fill" (click)="votar('incorrecto')"><i class="bi bi-hand-thumbs-down me-1"></i>Incorrecto</button>
+            <button
+              class="btn btn-success flex-fill"
+              [disabled]="enviando()"
+              (click)="votar('confirmo')"
+            >
+              <i class="bi bi-hand-thumbs-up me-1"></i>Lo confirmo
+            </button>
+            <button
+              class="btn btn-outline-secondary flex-fill"
+              [disabled]="enviando()"
+              (click)="votar('incorrecto')"
+            >
+              <i class="bi bi-hand-thumbs-down me-1"></i>Incorrecto
+            </button>
           </div>
         }
-        <button class="btn btn-link text-danger btn-sm p-0" [disabled]="d.denunciado" (click)="denunciar()">
-          <i class="bi bi-flag me-1"></i>{{ d.denunciado ? 'Ya denunciaste este reporte' : 'Denunciar reporte' }}
+        <button
+          class="btn btn-link text-danger btn-sm p-0"
+          [disabled]="d.denunciado || enviando()"
+          (click)="denunciar()"
+        >
+          <i class="bi bi-flag me-1"></i
+          >{{ d.denunciado ? 'Ya denunciaste este reporte' : 'Denunciar reporte' }}
         </button>
       }
     }
 
     @if (auth.esMunicipalidad()) {
+      @if (d.acciones.length === 0 && d.estado !== 'archivado') {
+        <button class="btn btn-acento w-100 mb-2" (click)="responder.emit(d.id)">
+          <i class="bi bi-reply me-1"></i>Responder con una acción
+        </button>
+      }
       <div class="d-flex gap-2">
-        <button class="btn btn-outline-danger flex-fill" (click)="moderar('falso')"><i class="bi bi-x-octagon me-1"></i>Marcar falso</button>
-        <button class="btn btn-outline-secondary flex-fill" (click)="moderar('archivado')"><i class="bi bi-archive me-1"></i>Archivar</button>
+        <button
+          class="btn btn-outline-danger flex-fill"
+          [disabled]="enviando() || d.estado === 'falso'"
+          (click)="moderar('falso')"
+        >
+          <i class="bi bi-x-octagon me-1"></i>Marcar falso
+        </button>
+        <button
+          class="btn btn-outline-secondary flex-fill"
+          [disabled]="enviando()"
+          (click)="moderar('archivado')"
+        >
+          <i class="bi bi-archive me-1"></i>Archivar
+        </button>
       </div>
     }
   }

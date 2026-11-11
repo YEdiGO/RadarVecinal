@@ -24,10 +24,24 @@ export class Estadisticas {
     this.barras(this.zonas().map((z) => ({ nombre: z.nombre, valor: z.cantidad }))),
   );
 
+  protected readonly resumen = computed(() => {
+    const zonas = this.zonas();
+    const masCaliente = [...zonas].sort((a, b) => b.temperatura - a.temperatura)[0];
+    return {
+      total: this.reportes().length,
+      barrios: zonas.length,
+      criticos: zonas.filter((z) => z.nivel === 'naranja' || z.nivel === 'rojo').length,
+      caliente: masCaliente?.nombre ?? '—',
+      temperatura: masCaliente?.temperatura ?? 0,
+    };
+  });
+
   protected readonly porTipo = computed(() => {
     const conteo = new Map<TipoIncidente, number>();
     for (const r of this.reportes()) conteo.set(r.tipo, (conteo.get(r.tipo) ?? 0) + 1);
-    return this.barras([...conteo].map(([tipo, valor]) => ({ nombre: ETIQUETA_TIPO[tipo], valor })));
+    return this.barras(
+      [...conteo].map(([tipo, valor]) => ({ nombre: ETIQUETA_TIPO[tipo], valor })),
+    );
   });
 
   protected readonly porMes = computed(() => {

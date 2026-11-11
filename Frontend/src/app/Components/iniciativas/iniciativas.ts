@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Barrio } from '../../Interfaces/barrio.interface';
@@ -25,6 +25,16 @@ export class Iniciativas implements OnInit {
   protected readonly creando = signal(false);
   protected readonly cargando = signal(true);
   protected readonly errorCarga = signal('');
+
+  protected readonly resumen = computed(() => {
+    const lista = this.lista();
+    return {
+      total: lista.length,
+      enCurso: lista.filter((i) => i.estado === 'En curso').length,
+      cumplidas: lista.filter((i) => i.estado === 'Cumplida').length,
+      participantes: lista.reduce((total, i) => total + i.participantes, 0),
+    };
+  });
 
   async ngOnInit(): Promise<void> {
     await this.cargar();
@@ -57,6 +67,21 @@ export class Iniciativas implements OnInit {
   }
 
   protected color(estado: string): string {
-    return { Propuesta: 'secondary', 'En curso': 'primary', Cumplida: 'success', Cancelada: 'danger' }[estado] ?? 'secondary';
+    return (
+      { Propuesta: 'secondary', 'En curso': 'primary', Cumplida: 'success', Cancelada: 'danger' }[
+        estado
+      ] ?? 'secondary'
+    );
+  }
+
+  protected icono(estado: string): string {
+    return (
+      {
+        Propuesta: 'bi-lightbulb',
+        'En curso': 'bi-arrow-repeat',
+        Cumplida: 'bi-check2-circle',
+        Cancelada: 'bi-slash-circle',
+      }[estado] ?? 'bi-megaphone'
+    );
   }
 }
